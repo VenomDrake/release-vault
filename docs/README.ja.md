@@ -106,7 +106,7 @@ release-vault/
 
 ## 👥 貢献者＆クレジット
 
-- 👑 **[VenomDrake](https://github.com/VenomDrake)** — プロジェクト創設者・主任メンテナー・アーキテクチャ設計＆エンジニアリング
+- 👑 **[VenomDrake](https://github.com/VenomDrake)** — プロジェクト創設者・主任メンテナー・主任開発者・アーキテクチャ設計＆エンジニアリング
 - 🤖 **[Antigravity (Google DeepMind)](https://deepmind.google)** — AI共同開発者・アーキテクチャ設計＆エンジニアリング
 ---
 

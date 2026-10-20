@@ -106,7 +106,7 @@ release-vault/
 
 ## 👥 贡献者与致谢
 
-- 👑 **[VenomDrake](https://github.com/VenomDrake)** — 项目创建者、核心维护者、架构设计与全栈工程
+- 👑 **[VenomDrake](https://github.com/VenomDrake)** — 项目创建者、核心维护者、主开发者、架构设计与全栈工程
 - 🤖 **[Antigravity (Google DeepMind)](https://deepmind.google)** — AI 联合开发者、架构设计与全栈工程
 ---
 
