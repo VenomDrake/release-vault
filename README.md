@@ -1,15 +1,18 @@
 # 🗄️ Release Vault
 
-[![Donate with PayPal](https://img.shields.io/badge/☕_Support_%2F_Donate-PayPal.Me%2Fvenomdrake-0070ba?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/venomdrake)
+[![Donate with PayPal](https://img.shields.io/badge/☕_Supporta_%2F_Dona-PayPal.Me%2Fvenomdrake-0070ba?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/venomdrake)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
 
-**Self-Hosted Release Archiver, Patch Notes Explorer & 24/7 Telegram Bot** per progetti **GitHub** e mod di **Nexus Mods**.
+> 🌐 **Seleziona la tua lingua / Select your language:**
+> **[🇮🇹 Italiano](README.md)** · [🇬🇧 English](docs/README.en.md) · [🇪🇸 Español](docs/README.es.md) · [🇫🇷 Français](docs/README.fr.md) · [🇩🇪 Deutsch](docs/README.de.md) · [🇧🇷 Português](docs/README.pt.md) · [🇷🇺 Русский](docs/README.ru.md) · [🇨🇳 中文](docs/README.zh.md) · [🇯🇵 日本語](docs/README.ja.md) · [🇰🇷 한국어](docs/README.ko.md)
 
-Supporta **10 lingue complete** (🇮🇹 Italiano, 🇬🇧 English, 🇪🇸 Español, 🇫🇷 Français, 🇩🇪 Deutsch, 🇧🇷 Português, 🇷🇺 Русский, 🇨🇳 中文, 🇯🇵 日本語, 🇰🇷 한국어) che traducono l'intera interfaccia e include una **Procedura Guidata Interattiva al Primo Avvio (5-Step Setup Wizard)** accessibile in qualsiasi momento dal pulsante **`📖 Guida & Wizard`**.
+**Self-Hosted Release Archiver, Patch Notes Explorer & Bot Telegram 24/7** per progetti **GitHub** e mod di **Nexus Mods**.
+
+Supporta **10 lingue complete** che traducono l'intera interfaccia e include una **Procedura Guidata Interattiva al Primo Avvio (5-Step Setup Wizard)** accessibile in qualsiasi momento dal pulsante **`📖 Guida & Wizard`**.
 
 ---
 
-## ✨ Funzionalità Principali / Key Features
+## ✨ Funzionalità Principali
 
 - 🐙 **Archiviazione Completa GitHub**:
   - Scarica automaticamente tutte le release (Stable e Pre-release/Beta), asset binari, codice sorgente (`.zip` / `.tar.gz`), Patch Notes in Markdown (`PATCH_NOTES.md`) e metadati (`release-metadata.json`) con calcolo **SHA256**.
@@ -32,7 +35,7 @@ Supporta **10 lingue complete** (🇮🇹 Italiano, 🇬🇧 English, 🇪🇸 E
 
 ---
 
-## 🚀 Installazione Rapida / Quick Start
+## 🚀 Installazione Rapida
 
 ### Opzione A: Script Automatico Linux / Proxmox LXC (Debian / Ubuntu)
 
@@ -78,6 +81,17 @@ docker compose up -d --build
 release-vault/
 ├── server.py              # Backend FastAPI, SQLite, Downloader GitHub/Nexus Mods & API
 ├── telegram_bot.py        # Bot Telegram 24/7 interattivo con controllo accesso User ID
+├── README.md              # README principale (Italiano) con selettore 10 lingue
+├── docs/                  # README tradotti in tutte le 10 lingue supportate
+│   ├── README.en.md
+│   ├── README.es.md
+│   ├── README.fr.md
+│   ├── README.de.md
+│   ├── README.pt.md
+│   ├── README.ru.md
+│   ├── README.zh.md
+│   ├── README.ja.md
+│   └── README.ko.md
 ├── static/
 │   └── index.html         # Web UI Single-Page App, Setup Wizard, 10 Lingue, Markdown Viewer
 ├── install.sh             # Installer automatico per Debian/Ubuntu/Proxmox LXC (systemd)
@@ -90,8 +104,8 @@ release-vault/
 
 ---
 
-## ☕ Supporta il Progetto / Support & Donate
+## ☕ Supporta il Progetto / Donazioni
 
 Se **Release Vault** ti è utile e vuoi supportarne lo sviluppo:
 
-👉 **[☕ Dona su PayPal (paypal.me/venomdrake)](https://www.paypal.com/paypalme/venomdrake)**
+👉 **[☕ Supporta / Dona su PayPal (paypal.me/venomdrake)](https://www.paypal.com/paypalme/venomdrake)**
