@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional
 import httpx
 
 # --- Dynamic Bot Configuration (loaded from SQLite settings or environment) ---
-VAULT_API_BASE = os.environ.get("VAULT_API_BASE", "http://127.0.0.1:80")
+VAULT_API_BASE = os.environ.get("VAULT_API_BASE") or os.environ.get("VAULT_API_URL") or "http://127.0.0.1:80"
 INTERNAL_HEADERS = {"X-Internal-Bot": "release-vault-bot"}
 DB_PATH = Path(os.environ.get("VAULT_DB_PATH", "/srv/github-vault/vault.db"))
 

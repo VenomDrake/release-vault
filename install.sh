@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# GitHub & Nexus Mods Release Vault — Automated Linux / Proxmox LXC Installer
+# Release Vault — Automated Linux / Proxmox LXC Installer
 # Installs Python venv, dependencies, and systemd services (Web UI + Telegram Bot)
 # ==============================================================================
 set -euo pipefail
@@ -11,7 +11,7 @@ ARCHIVE_DIR="${VAULT_ARCHIVE_DIR:-/srv/github-vault/archives}"
 PORT="${VAULT_PORT:-8080}"
 
 echo "=================================================================="
-echo " 🚀 GitHub & Nexus Mods Release Vault — Installer"
+echo " 🚀 Release Vault — Installer"
 echo "=================================================================="
 
 if [[ $EUID -ne 0 ]]; then
@@ -44,7 +44,7 @@ echo "⚙️  [4/4] Configuring systemd services (github-vault & github-vault-bo
 
 cat >/etc/systemd/system/github-vault.service <<EOF
 [Unit]
-Description=GitHub & Nexus Mods Release Vault Web Server
+Description=Release Vault Web Server
 After=network-online.target
 Wants=network-online.target
 
@@ -64,7 +64,7 @@ EOF
 
 cat >/etc/systemd/system/github-vault-bot.service <<EOF
 [Unit]
-Description=GitHub & Nexus Mods Release Vault 24/7 Telegram Bot
+Description=Release Vault 24/7 Telegram Bot
 After=network-online.target github-vault.service
 Wants=github-vault.service
 
@@ -73,6 +73,7 @@ Type=simple
 WorkingDirectory=${APP_DIR}
 Environment="VAULT_DATA_DIR=${DATA_DIR}"
 Environment="VAULT_DB_PATH=${DATA_DIR}/vault.db"
+Environment="VAULT_API_BASE=http://127.0.0.1:${PORT}"
 Environment="VAULT_API_URL=http://127.0.0.1:${PORT}"
 ExecStart=${APP_DIR}/venv/bin/python ${APP_DIR}/telegram_bot.py
 Restart=always
