@@ -3,8 +3,8 @@
 [![Donate with PayPal](https://img.shields.io/badge/☕_サポート_%2F_寄付-PayPal.Me%2Fvenomdrake-0070ba?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/venomdrake)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](../LICENSE)
 
-> 🌐 **言語を選択してください:**
-> [🇮🇹 Italiano](../README.md) · [🇬🇧 English](README.en.md) · [🇪🇸 Español](README.es.md) · [🇫🇷 Français](README.fr.md) · [🇩🇪 Deutsch](README.de.md) · [🇧🇷 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇨🇳 中文](README.zh.md) · **[🇯🇵 日本語](README.ja.md)** · [🇰🇷 한국어](README.ko.md)
+> 🌐 **言語を選択してください / Select your language:**
+> [🇬🇧 English](../README.md) · [🇮🇹 Italiano](README.it.md) · [🇪🇸 Español](README.es.md) · [🇫🇷 Français](README.fr.md) · [🇩🇪 Deutsch](README.de.md) · [🇧🇷 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇨🇳 中文](README.zh.md) · **[🇯🇵 日本語](README.ja.md)** · [🇰🇷 한국어](README.ko.md)
 
 **GitHub** リポジトリおよび **Nexus Mods** 用の **セルフホスト型リリースアーカイバ、パッチノートエクスプローラー＆24時間稼働 Telegram ボット**。
 
@@ -83,7 +83,7 @@ release-vault/
 ├── telegram_bot.py        # User ID アクセス制限付き 24/7 対話型 Telegram ボット
 ├── README.md              # 10言語セレクター付きメイン README
 ├── docs/                  # 全10言語に翻訳された README ファイル群
-│   ├── README.en.md
+│   ├── README.it.md
 │   ├── README.es.md
 │   ├── README.fr.md
 │   ├── README.de.md

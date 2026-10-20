@@ -3,8 +3,8 @@
 [![Donate with PayPal](https://img.shields.io/badge/☕_Apoiar_%2F_Doar-PayPal.Me%2Fvenomdrake-0070ba?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/venomdrake)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](../LICENSE)
 
-> 🌐 **Selecione o seu idioma:**
-> [🇮🇹 Italiano](../README.md) · [🇬🇧 English](README.en.md) · [🇪🇸 Español](README.es.md) · [🇫🇷 Français](README.fr.md) · [🇩🇪 Deutsch](README.de.md) · **[🇧🇷 Português](README.pt.md)** · [🇷🇺 Русский](README.ru.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇰🇷 한국어](README.ko.md)
+> 🌐 **Selecione o seu idioma / Select your language:**
+> [🇬🇧 English](../README.md) · [🇮🇹 Italiano](README.it.md) · [🇪🇸 Español](README.es.md) · [🇫🇷 Français](README.fr.md) · [🇩🇪 Deutsch](README.de.md) · **[🇧🇷 Português](README.pt.md)** · [🇷🇺 Русский](README.ru.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇰🇷 한국어](README.ko.md)
 
 **Arquivador Auto-Hospedado de Releases, Explorador de Notas de Atualização e Bot do Telegram 24/7** para projetos do **GitHub** e mods do **Nexus Mods**.
 
@@ -37,7 +37,7 @@ Suporta **10 idiomas completos** que traduzem toda a interface e inclui um **Ass
 
 ## 🚀 Instalação Rápida
 
-### Opção A: Script Automático Linux / Proxmox LXC (Debian / Ubuntu)
+### Opzione A: Script Automático Linux / Proxmox LXC (Debian / Ubuntu)
 
 ```bash
 git clone https://github.com/VenomDrake/release-vault.git release-vault
@@ -83,7 +83,7 @@ release-vault/
 ├── telegram_bot.py        # Bot do Telegram 24/7 interativo com controle de acesso por User ID
 ├── README.md              # README principal com seletor de 10 idiomas
 ├── docs/                  # Arquivos README traduzidos nos 10 idiomas suportados
-│   ├── README.en.md
+│   ├── README.it.md
 │   ├── README.es.md
 │   ├── README.fr.md
 │   ├── README.de.md

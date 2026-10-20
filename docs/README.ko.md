@@ -3,8 +3,8 @@
 [![Donate with PayPal](https://img.shields.io/badge/☕_후원_%2F_기부-PayPal.Me%2Fvenomdrake-0070ba?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/venomdrake)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](../LICENSE)
 
-> 🌐 **언어를 선택하세요:**
-> [🇮🇹 Italiano](../README.md) · [🇬🇧 English](README.en.md) · [🇪🇸 Español](README.es.md) · [🇫🇷 Français](README.fr.md) · [🇩🇪 Deutsch](README.de.md) · [🇧🇷 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · **[🇰🇷 한국어](README.ko.md)**
+> 🌐 **언어를 선택하세요 / Select your language:**
+> [🇬🇧 English](../README.md) · [🇮🇹 Italiano](README.it.md) · [🇪🇸 Español](README.es.md) · [🇫🇷 Français](README.fr.md) · [🇩🇪 Deutsch](README.de.md) · [🇧🇷 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · **[🇰🇷 한국어](README.ko.md)**
 
 **GitHub** 프로젝트 및 **Nexus Mods** 모드를 위한 **셀프 호스팅 릴리스 아카이버, 패치 노트 탐색기 & 24/7 텔레그램 봇**.
 
@@ -83,7 +83,7 @@ release-vault/
 ├── telegram_bot.py        # User ID 접근 제어가 적용된 24/7 대화형 텔레그램 봇
 ├── README.md              # 10개 언어 선택기가 포함된 메인 README
 ├── docs/                  # 지원되는 10개 언어로 번역된 README 문서
-│   ├── README.en.md
+│   ├── README.it.md
 │   ├── README.es.md
 │   ├── README.fr.md
 │   ├── README.de.md

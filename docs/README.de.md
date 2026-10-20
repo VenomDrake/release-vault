@@ -3,8 +3,8 @@
 [![Donate with PayPal](https://img.shields.io/badge/☕_Unterstützen_%2F_Spenden-PayPal.Me%2Fvenomdrake-0070ba?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/venomdrake)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](../LICENSE)
 
-> 🌐 **Wähle deine Sprache:**
-> [🇮🇹 Italiano](../README.md) · [🇬🇧 English](README.en.md) · [🇪🇸 Español](README.es.md) · [🇫🇷 Français](README.fr.md) · **[🇩🇪 Deutsch](README.de.md)** · [🇧🇷 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇰🇷 한국어](README.ko.md)
+> 🌐 **Wähle deine Sprache / Select your language:**
+> [🇬🇧 English](../README.md) · [🇮🇹 Italiano](README.it.md) · [🇪🇸 Español](README.es.md) · [🇫🇷 Français](README.fr.md) · **[🇩🇪 Deutsch](README.de.md)** · [🇧🇷 Português](README.pt.md) · [🇷🇺 Русский](README.ru.md) · [🇨🇳 中文](README.zh.md) · [🇯🇵 日本語](README.ja.md) · [🇰🇷 한국어](README.ko.md)
 
 **Selbstgehostetes Release-Archiv, Patch-Notes-Explorer & 24/7 Telegram-Bot** für **GitHub**-Projekte und **Nexus Mods**.
 
@@ -83,7 +83,7 @@ release-vault/
 ├── telegram_bot.py        # Interaktiver 24/7 Telegram-Bot mit User-ID-Zugriffskontrolle
 ├── README.md              # Haupt-README mit 10-Sprachen-Auswahl
 ├── docs/                  # Übersetzte README-Dateien in allen 10 unterstützten Sprachen
-│   ├── README.en.md
+│   ├── README.it.md
 │   ├── README.es.md
 │   ├── README.fr.md
 │   ├── README.de.md

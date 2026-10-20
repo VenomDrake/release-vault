@@ -127,7 +127,7 @@ async def build_dashboard_message(client: httpx.AsyncClient) -> tuple[str, Dict[
     cats = ov.get("categories") or ["Giochi", "Emulatore", "MOD VR"]
 
     text = (
-        f"🛡 <b>GitHub & Nexus Release Vault — Bot Privato</b>\n"
+        f"🛡 <b>Release Vault - Bot Privato</b>\n"
         f"👤 <i>Accesso esclusivo autorizzato (ID: {AUTHORIZED_USER_ID})</i>\n\n"
         f"📦 <b>Repository monitorati:</b> {ov.get('repositories_count', 0)}\n"
         f"🏷 <b>Release archiviate:</b> {ov.get('completed_releases', 0)} / {ov.get('total_releases', 0)}\n"
@@ -190,25 +190,25 @@ def build_pending_add_view(key: str, item: Dict[str, Any]) -> tuple[str, Dict[st
     existing_cats = item.get("existing_categories") or ["Giochi", "Emulatore", "MOD VR"]
     only_latest = bool(item.get("only_latest", False))
 
-    mode_text = "⚡ Solo l'ULTIMA release + future" if only_latest else "📚 Tutto lo storico (tutte le release)"
-    toggle_btn_text = (
-        "🔘 Modalità: ⚡ Solo Ultima + Future (clicca per Tutto Storico)"
-        if only_latest
-        else "🔘 Modalità: 📚 Tutto lo Storico (clicca per Solo Ultima)"
-    )
+    mode_text = "⚡ Solo l'ULTIMA release + successive" if only_latest else "📚 Tutte le release (Storico completo)"
+    btn_all_label = ("⬜ 📚 Tutte le Release" if only_latest else "✅ 📚 Tutte le Release")
+    btn_lat_label = ("✅ ⚡ Solo Ultima + Successive" if only_latest else "⬜ ⚡ Solo Ultima + Successive")
 
     text = (
         f"🔍 <b>[{provider_label}] Rilevato:</b> <code>{html.escape(full_name)}</code>\n"
         f"📝 <i>{desc}</i>\n\n"
         f"✨ <b>Categoria consigliata:</b> <code>{html.escape(sug_cat)}</code>\n"
         f"🏷 <b>Tag auto-generati:</b> <code>{html.escape(sug_tags)}</code>\n"
-        f"📦 <b>Modalità download:</b> <b>{mode_text}</b>\n\n"
-        f"👇 <b>Scegli la modalità e clicca sulla categoria per confermare:</b>"
+        f"📦 <b>Modalità selezionata:</b> <b>{mode_text}</b>\n\n"
+        f"👇 <b>1) Seleziona se scaricare tutte o solo l'ultima + successive:\n2) Clicca sulla categoria per confermare e avviare:</b>"
     )
 
     keyboard: List[List[Dict[str, str]]] = [
-        [{"text": toggle_btn_text, "callback_data": f"togmode:{key}"}],
-        [{"text": f"✅ Conferma: {sug_cat} (Consigliata)", "callback_data": f"add:{key}:{sug_cat[:20]}"}],
+        [
+            {"text": btn_all_label, "callback_data": f"setmode:{key}:0"},
+            {"text": btn_lat_label, "callback_data": f"setmode:{key}:1"},
+        ],
+        [{"text": f"✅ Conferma in: {sug_cat} (Consigliata)", "callback_data": f"add:{key}:{sug_cat[:20]}"}],
     ]
     other_Btns = []
     for c in existing_cats:
@@ -338,13 +338,16 @@ async def handle_callback_query(client: httpx.AsyncClient, cb: Dict[str, Any]) -
         releases = rdata["releases"]
         latest = releases[0] if releases else None
         is_paused = bool(repo.get("paused")) or repo.get("status") == "paused"
+        only_latest = bool(repo.get("only_latest"))
 
         status_str = "⏸ IN PAUSA" if is_paused else "✅ ATTIVO"
+        mode_str = "⚡ Solo Ultima + Successive" if only_latest else "📚 Tutte le Release (Storico)"
         text = (
             f"📦 <b>{html.escape(repo['full_name'])}</b> [{status_str}]\n"
             f"📁 Categoria: <code>{html.escape(repo.get('category') or 'Generale')}</code>\n"
             f"🏷 Tag: <code>{html.escape(repo.get('tags') or 'Nessuno')}</code>\n"
-            f"📚 Release totali: <b>{len(releases)}</b>\n\n"
+            f"⚙️ Modalità: <b>{mode_str}</b>\n"
+            f"📚 Release in archivio: <b>{len(releases)}</b>\n\n"
         )
         if latest:
             body_preview = html.escape((latest.get("body") or "Nessuna patch note.")[:500])
@@ -356,14 +359,69 @@ async def handle_callback_query(client: httpx.AsyncClient, cb: Dict[str, Any]) -
             )
 
         pause_label = "▶️ Riprendi Sincronizzazione" if is_paused else "⏸ Metti in Pausa Repo"
+        btn_all_repo = "⬜ 📚 Tutte le Release" if only_latest else "✅ 📚 Tutte le Release"
+        btn_lat_repo = "✅ ⚡ Solo Ultima + Succ." if only_latest else "⬜ ⚡ Solo Ultima + Succ."
         kb = [
+            [
+                {"text": btn_all_repo, "callback_data": f"repomode:{repo_id}:0"},
+                {"text": btn_lat_repo, "callback_data": f"repomode:{repo_id}:1"},
+            ],
             [
                 {"text": pause_label, "callback_data": f"pauserepo:{repo_id}"},
                 {"text": "🔄 Controlla Ora", "callback_data": f"syncrepo:{repo_id}"},
             ],
+            [
+                {"text": "🧹 Pulisci Dati & Riscarica", "callback_data": f"repopurge:{repo_id}"},
+            ],
             [{"text": f"⬅️ Torna a {repo.get('category')}", "callback_data": f"cat:{(repo.get('category') or 'Generale')[:24]}"}],
         ]
         await edit_msg(client, chat_id, message_id, text, {"inline_keyboard": kb})
+
+    elif data.startswith("repomode:"):
+        parts = data.split(":")
+        repo_id = int(parts[1])
+        target_only_latest = parts[2] == "1" if len(parts) > 2 else True
+        rel_resp = await client.get(f"{VAULT_API_BASE}/api/repos/{repo_id}/releases", headers=INTERNAL_HEADERS, timeout=10.0)
+        if rel_resp.status_code == 200:
+            repo = rel_resp.json()["repository"]
+            update_payload = {
+                "category": repo.get("category") or "Generale",
+                "tags": repo.get("tags") or "",
+                "include_prereleases": bool(repo.get("include_prereleases", 1)),
+                "download_source": bool(repo.get("download_source", 1)),
+                "only_latest": target_only_latest,
+                "asset_filter": repo.get("asset_filter") or "",
+            }
+            await client.put(f"{VAULT_API_BASE}/api/repos/{repo_id}", json=update_payload, headers=INTERNAL_HEADERS, timeout=10.0)
+        cb["data"] = f"repo:{repo_id}"
+        await handle_callback_query(client, cb)
+
+    elif data.startswith("repopurge:"):
+        repo_id = int(data.split(":", 1)[1])
+        await edit_msg(
+            client,
+            chat_id,
+            message_id,
+            "🧹 <b>Confermi la pulizia dei file scaricati per questa repository?</b>\n\n"
+            "Verranno eliminati i vecchi file dal disco e verrà riavviato subito il download in base alla modalità scelta (es. <i>Solo Ultima + Successive</i>).",
+            {
+                "inline_keyboard": [
+                    [{"text": "✅ Sì, Pulisci e Riscarica Ora", "callback_data": f"repopurge_ok:{repo_id}"}],
+                    [{"text": "❌ Annulla", "callback_data": f"repo:{repo_id}"}],
+                ]
+            },
+        )
+
+    elif data.startswith("repopurge_ok:"):
+        repo_id = int(data.split(":", 1)[1])
+        await client.post(f"{VAULT_API_BASE}/api/repos/{repo_id}/purge-data?resync=true", headers=INTERNAL_HEADERS, timeout=20.0)
+        await edit_msg(
+            client,
+            chat_id,
+            message_id,
+            "✅ <b>Pulizia completata!</b> Riavviato il download con le nuove impostazioni.",
+            {"inline_keyboard": [[{"text": "⬅️ Torna al Repository", "callback_data": f"repo:{repo_id}"}]]},
+        )
 
     elif data.startswith("pauserepo:"):
         repo_id = int(data.split(":", 1)[1])
@@ -381,6 +439,18 @@ async def handle_callback_query(client: httpx.AsyncClient, cb: Dict[str, Any]) -
             "🔄 <b>Controllo nuove release avviato per questo repository!</b>",
             {"inline_keyboard": [[{"text": "⬅️ Torna al Repository", "callback_data": f"repo:{repo_id}"}]]},
         )
+
+    elif data.startswith("setmode:"):
+        parts = data.split(":")
+        key = parts[1]
+        val = parts[2] == "1" if len(parts) > 2 else False
+        item = PENDING_ADDS.get(key)
+        if not item:
+            await edit_msg(client, chat_id, message_id, "⚠️ Richiesta scaduta o già elaborata.")
+            return
+        item["only_latest"] = val
+        text, markup = build_pending_add_view(key, item)
+        await edit_msg(client, chat_id, message_id, text, markup)
 
     elif data.startswith("togmode:"):
         key = data.split(":", 1)[1]
