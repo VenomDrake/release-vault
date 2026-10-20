@@ -104,6 +104,13 @@ release-vault/
 
 ---
 
+## 👥 Contribuidores & Créditos
+
+- 👑 **[VenomDrake](https://github.com/VenomDrake)** — Criador, Mantenedor Principal & Proprietário do Projeto
+- 🤖 **[Antigravity (Google DeepMind)](https://deepmind.google)** — Co-Desenvolvedor IA, Arquitetura & Engenharia
+
+---
+
 ## ☕ Apoie o Projeto / Doar
 
 Se o **Release Vault** é útil para você e deseja apoiar o seu desenvolvimento:

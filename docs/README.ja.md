@@ -104,6 +104,13 @@ release-vault/
 
 ---
 
+## 👥 貢献者＆クレジット
+
+- 👑 **[VenomDrake](https://github.com/VenomDrake)** — プロジェクト創設者・主任メンテナー
+- 🤖 **[Antigravity (Google DeepMind)](https://deepmind.google)** — AI共同開発者・アーキテクチャ設計＆エンジニアリング
+
+---
+
 ## ☕ プロジェクトの支援 / 寄付
 
 **Release Vault** を気に入っていただけた場合、開発をサポートしていただけると嬉しいです:
