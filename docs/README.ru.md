@@ -106,9 +106,8 @@ release-vault/
 
 ## 👥 Авторы и Благодарности
 
-- 👑 **[VenomDrake](https://github.com/VenomDrake)** — Создатель, ведущий разработчик и владелец проекта
+- 👑 **[VenomDrake](https://github.com/VenomDrake)** — Создатель, ведущий разработчик, архитектура и полностековая разработка
 - 🤖 **[Antigravity (Google DeepMind)](https://deepmind.google)** — ИИ-соразработчик, архитектура и полностековая разработка
-
 ---
 
 ## ☕ Поддержать проект / Донат

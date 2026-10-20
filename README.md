@@ -106,9 +106,8 @@ release-vault/
 
 ## 👥 Contributors & Credits
 
-- 👑 **[VenomDrake](https://github.com/VenomDrake)** — Creator, Lead Maintainer & Project Owner
+- 👑 **[VenomDrake](https://github.com/VenomDrake)** — Creator, Lead Maintainer, Architecture & Engineering
 - 🤖 **[Antigravity (Google DeepMind)](https://deepmind.google)** — AI Co-Developer, Architecture & Engineering
-
 ---
 
 ## ☕ Support the Project / Donate
