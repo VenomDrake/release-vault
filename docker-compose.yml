@@ -1,0 +1,15 @@
+services:
+  release-vault:
+    build: .
+    container_name: release-vault
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - VAULT_DATA_DIR=/srv/github-vault
+      - VAULT_ARCHIVE_DIR=/srv/github-vault/archives
+      - VAULT_DB_PATH=/srv/github-vault/vault.db
+      - VAULT_DEFAULT_USER=admin
+      - VAULT_DEFAULT_PASS=admin
+    volumes:
+      - ./data:/srv/github-vault

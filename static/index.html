@@ -1,0 +1,3006 @@
+<!DOCTYPE html>
+<html lang="it" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Release Vault</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%236366f1'/%3E%3Cstop offset='100%25' stop-color='%234338ca'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230d0f18'/%3E%3Crect x='3' y='3' width='58' height='58' rx='13' fill='url(%23g)' fill-opacity='0.18' stroke='url(%23g)' stroke-width='2.5'/%3E%3Cpath d='M32 13L15 21.5v17L32 47l17-8.5v-17L32 13z' fill='none' stroke='%23818cf8' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M15 21.5L32 30l17-8.5M32 30v17' fill='none' stroke='%236366f1' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='30' r='3.5' fill='%23ffffff'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', ' system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            bg: {
+              950: '#090a0f',
+              900: '#10121a',
+              800: '#171a26',
+              700: '#222638',
+            },
+            accent: {
+              500: '#6366f1',
+              600: '#4f46e5',
+              400: '#818cf8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #090a0f;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090a0f; }
+    ::-webkit-scrollbar-thumb { background: #262b40; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b4262; }
+
+    /* Markdown Patch Notes Styling */
+    .markdown-body {
+      color: #cbd5e1;
+      line-height: 1.65;
+      font-size: 0.925rem;
+    }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+      color: #f8fafc;
+      font-weight: 600;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .markdown-body h1 { font-size: 1.35rem; border-bottom: 1px solid #1e293b; padding-bottom: 0.35rem; }
+    .markdown-body h2 { font-size: 1.15rem; border-bottom: 1px solid #1e293b; padding-bottom: 0.25rem; }
+    .markdown-body h3 { font-size: 1.02rem; }
+    .markdown-body p { margin-bottom: 0.75rem; }
+    .markdown-body ul { list-style-type: disc; padding-left: 1.4rem; margin-bottom: 0.85rem; }
+    .markdown-body ol { list-style-type: decimal; padding-left: 1.4rem; margin-bottom: 0.85rem; }
+    .markdown-body li { margin-bottom: 0.25rem; }
+    .markdown-body code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(99, 102, 241, 0.14);
+      color: #a5b4fc;
+      padding: 0.15rem 0.35rem;
+      border-radius: 0.3rem;
+      font-size: 0.83rem;
+    }
+    .markdown-body pre {
+      background: #0d0f17;
+      border: 1px solid #1e293b;
+      padding: 0.9rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin-bottom: 0.9rem;
+    }
+    .markdown-body pre code {
+      background: transparent;
+      color: #e2e8f0;
+      padding: 0;
+    }
+    .markdown-body a {
+      color: #818cf8;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .markdown-body blockquote {
+      border-left: 3px solid #6366f1;
+      padding-left: 0.9rem;
+      color: #94a3b8;
+      margin: 0.75rem 0;
+    }
+    .markdown-body hr {
+      border-color: #1e293b;
+      margin: 1.25rem 0;
+    }
+    .glass {
+      background: rgba(16, 18, 26, 0.82);
+      backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- LOGIN VIEW -->
+  <div id="login-view" class="hidden min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/30 via-bg-950 to-bg-950">
+    <div class="w-full max-w-md bg-bg-900 border border-slate-800/80 rounded-2xl p-8 shadow-2xl">
+      <div class="flex items-center justify-between gap-3 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-xl font-semibold text-white tracking-tight">Release Vault</h1>
+            <p data-i18n="loginSub" class="text-xs text-slate-400">Archivio Storico Privato & Patch Notes</p>
+          </div>
+        </div>
+        <select id="login-lang-select" onchange="changeLanguage(this.value)"
+          class="px-2 py-1 rounded-xl bg-bg-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer">
+          <option value="it">🇮🇹 IT</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="es">🇪🇸 ES</option>
+          <option value="fr">🇫🇷 FR</option>
+          <option value="de">🇩🇪 DE</option>
+          <option value="pt">🇧🇷 PT</option>
+          <option value="ru">🇷🇺 RU</option>
+          <option value="zh">🇨🇳 ZH</option>
+          <option value="ja">🇯🇵 JA</option>
+          <option value="ko">🇰🇷 KO</option>
+        </select>
+      </div>
+
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label data-i18n="lblUsername" class="block text-xs font-medium text-slate-400 mb-1.5">Nome Utente</label>
+          <input type="text" id="login-username" required autocomplete="username"
+            class="w-full px-3.5 py-2.5 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 transition"
+            placeholder="admin" />
+        </div>
+        <div>
+          <label data-i18n="lblPassword" class="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
+          <input type="password" id="login-password" required autocomplete="current-password"
+            class="w-full px-3.5 py-2.5 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 transition"
+            placeholder="••••••••" />
+        </div>
+        <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2"></div>
+        <button type="submit"
+          class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center justify-center gap-2">
+          <span data-i18n="btnLogin">Accedi al Vault</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP VIEW -->
+  <div id="app-view" class="hidden flex-1 flex flex-col min-h-screen">
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 glass border-b border-slate-800/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-5">
+          <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('repos')">
+            <div class="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+              </svg>
+            </div>
+            <div>
+              <span class="font-semibold text-white tracking-tight text-sm sm:text-base">Release Vault</span>
+              <span data-i18n="badgePrivate" class="hidden sm:inline-block ml-2 text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">PRIVATO</span>
+            </div>
+          </div>
+
+          <!-- Nav Tabs -->
+          <nav class="hidden md:flex items-center gap-1 bg-bg-950/90 p-1 rounded-xl border border-slate-800/80">
+            <button onclick="switchTab('repos')" id="tab-btn-repos" data-i18n="tabRepos" class="px-3.5 py-1.5 rounded-lg text-xs font-medium transition">
+              Repository
+            </button>
+            <button onclick="switchTab('feed')" id="tab-btn-feed" data-i18n="tabFeed" class="px-3.5 py-1.5 rounded-lg text-xs font-medium transition">
+              Storico & Feed Globale
+            </button>
+            <button onclick="switchTab('activity')" id="tab-btn-activity" class="px-3.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5">
+              <span data-i18n="tabActivity">Download & Log</span>
+              <span id="nav-queue-badge" class="hidden px-1.5 py-0.2 text-[10px] font-mono bg-indigo-500/20 text-indigo-300 rounded-full">0</span>
+            </button>
+            <button onclick="switchTab('settings')" id="tab-btn-settings" data-i18n="tabSettings" class="px-3.5 py-1.5 rounded-lg text-xs font-medium transition">
+              Impostazioni
+            </button>
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- 10-Language Selector -->
+          <select id="header-lang-select" onchange="changeLanguage(this.value)"
+            class="px-2.5 py-1.5 rounded-xl bg-bg-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+            title="Lingua / Language">
+            <option value="it">🇮🇹 IT</option>
+            <option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="de">🇩🇪 DE</option>
+            <option value="pt">🇧🇷 PT</option>
+            <option value="ru">🇷🇺 RU</option>
+            <option value="zh">🇨🇳 ZH</option>
+            <option value="ja">🇯🇵 JA</option>
+            <option value="ko">🇰🇷 KO</option>
+          </select>
+
+          <!-- PayPal Donation Button -->
+          <a href="https://www.paypal.com/paypalme/venomdrake" target="_blank" rel="noopener noreferrer" id="btn-donate-top"
+            class="px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-xs font-semibold text-amber-300 transition flex items-center gap-1.5"
+            title="PayPal - VenomDrake">
+            <span>☕</span>
+            <span data-i18n="btnDonate" class="hidden xl:inline">Supporta / Dona</span>
+          </a>
+
+          <button onclick="openSetupWizard(false)" id="btn-open-guide"
+            class="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-indigo-500/20 border border-slate-700/80 hover:border-indigo-500/40 text-xs font-medium text-indigo-300 transition flex items-center gap-1.5"
+            title="Guida & Setup Wizard">
+            <span>📖</span>
+            <span id="lbl-guide-btn" data-i18n="btnGuide" class="hidden lg:inline">Guida & Wizard</span>
+          </button>
+
+          <button onclick="toggleGlobalPause()" id="btn-pause-global"
+            class="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-amber-500/20 border border-slate-700/80 hover:border-amber-500/40 text-xs font-medium text-slate-200 transition flex items-center gap-1.5">
+            <span id="pause-global-icon">⏸</span>
+            <span id="pause-global-label" class="hidden sm:inline">Pausa Tutto</span>
+          </button>
+
+          <button onclick="triggerSyncAll()" id="btn-sync-all"
+            class="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-xs font-medium text-slate-200 transition flex items-center gap-1.5">
+            <svg id="sync-icon" class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span data-i18n="btnCheckNow" class="hidden sm:inline">Controlla Ora</span>
+          </button>
+
+          <button onclick="openAddRepoModal()"
+            class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white shadow-lg shadow-indigo-600/20 transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span data-i18n="btnAddSource">Aggiungi GitHub / Nexus</span>
+          </button>
+
+          <button onclick="logout()" title="Logout"
+            class="p-2 rounded-xl bg-bg-950 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/30 text-slate-400 hover:text-rose-400 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation Bar -->
+      <div class="md:hidden flex border-t border-slate-800/80 bg-bg-900 px-2 py-1.5 gap-1 overflow-x-auto">
+        <button onclick="switchTab('repos')" data-i18n="tabRepos" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-center text-slate-300">Repository</button>
+        <button onclick="switchTab('feed')" data-i18n="tabFeed" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-center text-slate-300">Feed</button>
+        <button onclick="switchTab('activity')" data-i18n="tabActivity" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-center text-slate-300">Coda & Log</button>
+        <button onclick="switchTab('settings')" data-i18n="tabSettings" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-center text-slate-300">Impostazioni</button>
+      </div>
+    </header>
+
+    <!-- GLOBAL PAUSE BANNER -->
+    <div id="global-pause-banner" class="hidden bg-amber-950/60 border-b border-amber-500/40 px-4 py-2.5">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2.5 text-amber-200 font-medium">
+          <span>⏸</span>
+          <span data-i18n="bannerGlobalPaused">Sincronizzazione e download globali in PAUSA — Nessun file viene scaricato al momento.</span>
+        </div>
+        <button onclick="toggleGlobalPause()" data-i18n="btnResumeNow" class="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200 font-semibold transition">
+          ▶️ Riprendi Tutto Ora
+        </button>
+      </div>
+    </div>
+
+    <!-- ACTIVE DOWNLOAD BANNER -->
+    <div id="active-download-banner" class="hidden bg-indigo-950/50 border-b border-indigo-500/30 px-4 py-2.5">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2.5">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
+          </span>
+          <span id="banner-dl-text" class="text-indigo-200 font-medium">Archiviazione release in corso...</span>
+        </div>
+        <div id="banner-queue-count" class="font-mono text-indigo-300"></div>
+      </div>
+    </div>
+
+    <!-- STATS BAR -->
+    <section class="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-6 pb-2">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="bg-bg-900/90 border border-slate-800/80 rounded-2xl p-4">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span data-i18n="statMonitoredRepos">Repository Monitorati</span>
+            <span class="text-indigo-400 font-mono">SOURCES</span>
+          </div>
+          <div id="stat-repos" class="text-2xl font-semibold text-white">0</div>
+          <div id="stat-last-check" data-i18n="statAutoCheck" class="text-[11px] text-slate-500 mt-1 truncate">Controllo automatico attivo</div>
+        </div>
+
+        <div class="bg-bg-900/90 border border-slate-800/80 rounded-2xl p-4">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span data-i18n="statArchivedReleases">Release Archiviate</span>
+            <span class="text-emerald-400 font-mono">ARCHIVE</span>
+          </div>
+          <div id="stat-releases" class="text-2xl font-semibold text-white">0</div>
+          <div id="stat-assets" class="text-[11px] text-slate-500 mt-1">0 file totali</div>
+        </div>
+
+        <div class="bg-bg-900/90 border border-slate-800/80 rounded-2xl p-4">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span data-i18n="statArchiveSize">Dimensione Archivio</span>
+            <span class="text-sky-400 font-mono">VAULT</span>
+          </div>
+          <div id="stat-archive-size" class="text-2xl font-semibold text-white">0 MB</div>
+          <div data-i18n="statShaNotes" class="text-[11px] text-slate-500 mt-1">Con SHA256 & Patch Notes</div>
+        </div>
+
+        <div class="bg-bg-900/90 border border-slate-800/80 rounded-2xl p-4">
+          <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <span data-i18n="statDiskSpace">Spazio Disco Server</span>
+            <span id="stat-disk-free" class="text-slate-300 font-mono">-- GB</span>
+          </div>
+          <div class="w-full bg-bg-950 h-2 rounded-full overflow-hidden my-2 border border-slate-800">
+            <div id="stat-disk-bar" class="bg-indigo-500 h-full rounded-full transition-all" style="width: 2%"></div>
+          </div>
+          <div id="stat-disk-detail" class="text-[11px] text-slate-500">--</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 flex-1">
+
+      <!-- TAB 1: REPOSITORIES LIST & REPO DETAIL -->
+      <div id="view-repos" class="space-y-4">
+        <!-- Sub-view A: Grid of Repositories -->
+        <div id="repos-grid-section" class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-bg-900/70 border border-slate-800/80 p-3.5 rounded-2xl">
+            <div class="relative flex-1">
+              <svg class="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input type="text" id="repo-search-input" oninput="renderReposGrid()"
+                data-i18n-placeholder="phSearchRepo"
+                placeholder="Cerca per nome repository, descrizione, tag o versione..."
+                class="w-full pl-10 pr-4 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition" />
+            </div>
+            <div id="category-pills" class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0"></div>
+          </div>
+
+          <div id="repos-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+          <!-- Detached Local Archives Section (Conserved on Disk Without Active Repo) -->
+          <div id="detached-archives-section" class="hidden pt-6 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span data-i18n="detachedTitle" class="text-sm font-semibold text-amber-300">🗄 Archivi Conservati sul Disco (Senza Repository Attiva)</span>
+                <span id="detached-count-badge" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">0</span>
+              </div>
+              <span data-i18n="detachedSub" class="text-xs text-slate-400">File e Patch Notes mantenuti sul server dopo l'eliminazione della repository</span>
+            </div>
+            <div id="detached-archives-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          </div>
+        </div>
+
+        <!-- Sub-view B: Single Repository Master-Detail View -->
+        <div id="repo-detail-section" class="hidden space-y-4">
+          <!-- Repo Top Bar -->
+          <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-3.5">
+              <button onclick="closeRepoDetail()"
+                class="mt-0.5 p-2 rounded-xl bg-bg-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+              </button>
+              <img id="detail-repo-avatar" src="" alt="" class="w-11 h-11 rounded-xl border border-slate-700 bg-bg-950 object-cover" />
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h2 id="detail-repo-title" class="text-lg font-semibold text-white"></h2>
+                  <span id="detail-repo-category" class="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-medium"></span>
+                  <span id="detail-detached-badge" data-i18n="badgeDetached" class="hidden text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono">🗄 ARCHIVIO CONSERVATO (SENZA REPO)</span>
+                  <a id="detail-repo-ghlink" href="#" target="_blank" class="text-xs text-slate-400 hover:text-indigo-400 flex items-center gap-1">
+                    <span id="detail-repo-provider-label">GitHub</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  </a>
+                </div>
+                <p id="detail-repo-desc" class="text-xs text-slate-400 mt-1 max-w-2xl"></p>
+                <div id="detail-repo-error" class="hidden mt-2 text-xs text-rose-300 bg-rose-500/15 border border-rose-500/30 rounded-xl px-3 py-1.5 font-medium"></div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="btn-detail-pause" onclick="toggleCurrentRepoPause()"
+                class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-amber-500/20 text-xs font-medium text-slate-200 border border-slate-700 hover:border-amber-500/40 transition flex items-center gap-1.5">
+                <span id="detail-pause-icon">⏸</span>
+                <span id="detail-pause-label" data-i18n="btnPauseRepo">Pausa Repo</span>
+              </button>
+              <button id="btn-detail-sync" onclick="syncCurrentRepo()"
+                class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                <span data-i18n="btnCheckReleases">Controlla Release</span>
+              </button>
+              <button id="btn-detail-edit" onclick="openEditRepoModal()" data-i18n="btnEditOptions"
+                class="px-3 py-2 rounded-xl bg-bg-950 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-800 transition">
+                Modifica Opzioni
+              </button>
+              <button id="btn-detail-purge" onclick="openPurgeDataModal()"
+                class="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-xs font-medium text-amber-300 border border-amber-500/30 transition flex items-center gap-1">
+                <span>🧹</span>
+                <span data-i18n="btnPurgeData">Elimina Dati</span>
+              </button>
+              <button id="btn-detail-delete" onclick="openDeleteRepoModal()" data-i18n="btnDeleteRepo"
+                class="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-xs font-medium text-rose-400 border border-rose-500/20 transition">
+                Elimina Repo
+              </button>
+            </div>
+          </div>
+
+          <!-- Master-Detail Columns: Left = Version History List, Right = Selected Release Inspector -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <!-- Left Column: Version Timeline -->
+            <div class="lg:col-span-4 bg-bg-900 border border-slate-800/80 rounded-2xl p-3.5 flex flex-col max-h-[75vh]">
+              <div class="flex items-center justify-between gap-2 mb-2.5">
+                <span data-i18n="lblVersionHistory" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Storico Versioni</span>
+                <select id="detail-channel-filter" onchange="renderRepoVersionsList()"
+                  class="bg-bg-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-300 focus:outline-none">
+                  <option value="all" data-i18n="optAllChannels">Tutte (Stable + Beta)</option>
+                  <option value="stable" data-i18n="optStableOnly">Solo Stable</option>
+                  <option value="prerelease" data-i18n="optPrereleaseOnly">Solo Pre-release</option>
+                </select>
+              </div>
+              <input type="text" id="detail-version-search" oninput="renderRepoVersionsList()"
+                data-i18n-placeholder="phFilterVersions"
+                placeholder="Filtra versione o testo nelle patch notes..."
+                class="w-full px-3 py-2 mb-3 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500" />
+
+              <div id="detail-versions-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1"></div>
+            </div>
+
+            <!-- Right Column: Selected Release Patch Notes & Downloadable Assets -->
+            <div id="detail-release-inspector" class="lg:col-span-8 bg-bg-900 border border-slate-800/80 rounded-2xl p-5 flex flex-col">
+              <div data-i18n="msgSelectVersion" class="text-center text-slate-500 py-16 text-sm">Seleziona una versione a sinistra per visualizzare file e patch notes.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: GLOBAL TIMELINE FEED -->
+      <div id="view-feed" class="hidden space-y-4">
+        <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div class="relative flex-1">
+            <svg class="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" id="feed-search-input" oninput="debounceLoadFeed()"
+              data-i18n-placeholder="phSearchFeed"
+              placeholder="Cerca in tutto lo storico (nome repo, versione, o parole dentro le Patch Notes)..."
+              class="w-full pl-10 pr-4 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+          <select id="feed-channel-select" onchange="loadGlobalFeed()"
+            class="bg-bg-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+            <option value="" data-i18n="optAllChannels">Tutti i canali (Stable + Pre-release)</option>
+            <option value="stable" data-i18n="optStableOnly">Solo Release Ufficiali (Stable)</option>
+            <option value="prerelease" data-i18n="optPrereleaseOnly">Solo Pre-release / Beta</option>
+          </select>
+        </div>
+
+        <div id="feed-list" class="space-y-4"></div>
+      </div>
+
+      <!-- TAB 3: DOWNLOAD QUEUE & ACTIVITY LOG -->
+      <div id="view-activity" class="hidden space-y-4">
+        <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-5">
+          <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+            <span data-i18n="hdrActiveDownloads">Download Attivi in Tempo Reale</span>
+            <span id="activity-queue-pill" class="text-xs font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300">0</span>
+          </h3>
+          <div id="active-downloads-list" class="space-y-2.5 text-xs text-slate-400"></div>
+        </div>
+
+        <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 data-i18n="hdrActivityLog" class="text-sm font-semibold text-white">Registro Storico Attività</h3>
+            <button onclick="refreshOverview()" data-i18n="btnRefresh" class="text-xs text-indigo-400 hover:underline">Aggiorna</button>
+          </div>
+          <div id="activity-logs-list" class="space-y-1.5 max-h-[55vh] overflow-y-auto font-mono text-xs"></div>
+        </div>
+      </div>
+
+      <!-- TAB 4: SETTINGS -->
+      <div id="view-settings" class="hidden space-y-6 max-w-4xl mx-auto">
+        <!-- GitHub API Token & Polling -->
+        <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-6 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-4">
+            <div>
+              <h3 data-i18n="setGhTitle" class="text-base font-semibold text-white">GitHub API & Sincronizzazione Automatica</h3>
+              <p data-i18n="setGhSub" class="text-xs text-slate-400">Inserisci un Personal Access Token per portare il limite da 60 a 5.000 richieste/ora e accedere ai tuoi repo privati.</p>
+            </div>
+            <div id="rate-limit-badge" class="text-xs font-mono px-3 py-1.5 rounded-xl bg-bg-950 border border-slate-800 text-slate-300">
+              API Rate Limit: --
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label data-i18n="lblGhToken" class="block text-xs font-medium text-slate-300 mb-1.5">GitHub Personal Access Token (opzionale)</label>
+              <input type="password" id="set-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 font-mono" />
+              <p id="set-gh-token-status" class="text-[11px] text-slate-500 mt-1"></p>
+            </div>
+            <div>
+              <label data-i18n="lblCheckInterval" class="block text-xs font-medium text-slate-300 mb-1.5">Intervallo Controllo Nuove Release (minuti)</label>
+              <input type="number" id="set-check-interval" min="5" max="1440"
+                class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500" />
+              <p data-i18n="lblCheckDefault" class="text-[11px] text-slate-500 mt-1">Default: 60 minuti (controlla ogni ora in background).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nexus Mods Integration -->
+        <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-6 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-4">
+            <div>
+              <h3 data-i18n="setNexusTitle" class="text-base font-semibold text-white">Integrazione Nexus Mods</h3>
+              <p data-i18n="setNexusSub" class="text-xs text-slate-400">Account dedicato configurato per scaricare automaticamente mod, vecchie versioni e changelogs da Nexus Mods.</p>
+            </div>
+            <div id="nexus-status-badge" class="text-xs font-mono px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300">
+              NEXUS MODS: Connesso
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label data-i18n="lblNexusUser" class="block text-xs font-medium text-slate-300 mb-1.5">Utente Nexus Mods</label>
+              <input type="text" id="set-nexus-user" placeholder="Username"
+                class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Nexus Personal API Key</label>
+              <input type="password" id="set-nexus-apikey" placeholder="API Key..."
+                class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 font-mono" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Session Cookie (<code>nexusmods_session</code>)</label>
+              <input type="password" id="set-nexus-session" placeholder="nexusmods_session..."
+                class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 font-mono" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-6 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-4">
+            <div>
+              <h3 data-i18n="setNotifTitle" class="text-base font-semibold text-white">Sistema di Notifiche</h3>
+              <p data-i18n="setNotifSub" class="text-xs text-slate-400">Ricevi un avviso automatico appena esce e viene scaricata una nuova release.</p>
+            </div>
+            <button onclick="sendTestNotification()" data-i18n="btnTestNotif"
+              class="px-3 py-1.5 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-xs font-medium text-indigo-300 transition">
+              Invia Notifica di Test
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Discord Webhook URL</label>
+              <input type="url" id="set-discord-webhook" placeholder="https://discord.com/api/webhooks/..."
+                class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 font-mono" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Telegram Bot Token</label>
+                <input type="text" id="set-tg-token" placeholder="123456789:ABCdefGHIjklMNO..."
+                  class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 font-mono" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1">Telegram Chat ID</label>
+                <input type="text" id="set-tg-chat" placeholder="987654321"
+                  class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 font-mono" />
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/70">
+              <div data-i18n="lblSmtp" class="text-xs font-medium text-slate-300 mb-2">Notifiche Email (SMTP)</div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input type="text" id="set-smtp-host" placeholder="SMTP Host (smtp.gmail.com)"
+                  class="px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white" />
+                <input type="text" id="set-smtp-port" placeholder="Port (587)"
+                  class="px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white" />
+                <input type="text" id="set-smtp-user" placeholder="SMTP User"
+                  class="px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white" />
+                <input type="password" id="set-smtp-pass" placeholder="SMTP Password"
+                  class="px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white" />
+                <input type="email" id="set-smtp-from" placeholder="From (vault@domain.com)"
+                  class="px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white" />
+                <input type="email" id="set-smtp-to" placeholder="To (you@domain.com)"
+                  class="px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Credentials -->
+        <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-6 space-y-4">
+          <div class="border-b border-slate-800 pb-3">
+            <h3 data-i18n="setCredsTitle" class="text-base font-semibold text-white">Credenziali di Accesso</h3>
+            <p data-i18n="setCredsSub" class="text-xs text-slate-400">Modifica l'utenza di accesso al portale.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label data-i18n="lblNewUsername" class="block text-xs font-medium text-slate-300 mb-1">Nuovo Username</label>
+              <input type="text" id="set-new-username" placeholder="admin"
+                class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500" />
+            </div>
+            <div>
+              <label data-i18n="lblNewPassword" class="block text-xs font-medium text-slate-300 mb-1">Nuova Password (lascia vuoto per non cambiare)</label>
+              <input type="password" id="set-new-password"
+                class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500" />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button onclick="saveSettings()" data-i18n="btnSaveSettings"
+            class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white shadow-lg shadow-indigo-600/20 transition">
+            Salva Tutte le Impostazioni
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <datalist id="existing-categories-datalist"></datalist>
+
+  <!-- MODAL: ADD REPOSITORY -->
+  <div id="modal-add-repo" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-bg-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 data-i18n="modalAddTitle" class="text-base font-semibold text-white">Aggiungi da GitHub o Nexus Mods</h3>
+        <button onclick="closeAddRepoModal()" class="text-slate-400 hover:text-white">&times;</button>
+      </div>
+
+      <form id="form-add-repo" class="space-y-4">
+        <div>
+          <label data-i18n="lblSourceLink" class="block text-xs font-medium text-slate-300 mb-1">Link GitHub oppure Nexus Mods *</label>
+          <input type="text" id="add-repo-input" required oninput="onAddRepoInputChanged()"
+            placeholder="https://github.com/owner/repo  |  https://www.nexusmods.com/game/mods/123"
+            class="w-full px-3.5 py-2.5 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500" />
+          <div id="add-repo-auto-hint" data-i18n="hintAutoTag" class="text-[11px] text-slate-500 mt-1">
+            Incolla un link GitHub o Nexus Mods: Categoria e Tag vengono generati in automatico.
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label data-i18n="lblCategory" class="block text-xs font-medium text-slate-300">Categoria (clicca una esistente o scrivi nuova)</label>
+              <span class="text-[10px] text-indigo-400 font-mono">Auto-Memory</span>
+            </div>
+            <div id="add-category-quick-picks" class="flex flex-wrap gap-1.5 mb-2"></div>
+            <input type="text" id="add-repo-category" list="existing-categories-datalist"
+              placeholder="Auto"
+              class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label data-i18n="lblTags" class="block text-xs font-medium text-slate-300">Tag (generati in automatico dal link)</label>
+              <span class="text-[10px] text-emerald-400 font-mono">✨ Auto-Tag</span>
+            </div>
+            <input type="text" id="add-repo-tags" placeholder="Auto"
+              class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+        </div>
+
+        <div>
+          <label data-i18n="lblAssetFilter" class="block text-xs font-medium text-slate-300 mb-1">Filtro File Opzionale (Regex)</label>
+          <input type="text" id="add-repo-filter" placeholder=".*"
+            class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <div class="space-y-2.5 pt-1">
+          <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/25 text-xs text-slate-200 cursor-pointer hover:bg-indigo-500/15 transition">
+            <input type="checkbox" id="add-repo-only-latest" onchange="onOnlyLatestToggled()" class="mt-0.5 rounded bg-bg-950 border-slate-700 text-indigo-600" />
+            <div>
+              <div data-i18n="chkOnlyLatestTitle" class="font-semibold text-indigo-300">⚡ Scarica solo l'ULTIMA release e le successive future</div>
+              <div data-i18n="chkOnlyLatestSub" class="text-[11px] text-slate-400 mt-0.5">Ignora tutte le vecchie versioni passate: scarica subito solo l'ultima build disponibile e tutte quelle che usciranno in futuro.</div>
+            </div>
+          </label>
+          <label class="flex items-center gap-2.5 text-xs text-slate-300 cursor-pointer">
+            <input type="checkbox" id="add-repo-prerelease" checked class="rounded bg-bg-950 border-slate-700 text-indigo-600" />
+            <span data-i18n="chkIncludePrerelease">Includi sia Stable che Pre-release / Beta / Nightly</span>
+          </label>
+          <label class="flex items-center gap-2.5 text-xs text-slate-300 cursor-pointer">
+            <input type="checkbox" id="add-repo-source" checked class="rounded bg-bg-950 border-slate-700 text-indigo-600" />
+            <span data-i18n="chkDownloadSource">Archivia anche il Codice Sorgente (.zip e .tar.gz) di ogni versione</span>
+          </label>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeAddRepoModal()" data-i18n="btnCancel" class="px-4 py-2 rounded-xl bg-bg-950 border border-slate-800 text-xs text-slate-300">Annulla</button>
+          <button type="submit" id="btn-submit-add-repo" data-i18n="btnAddHistory" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white">
+            Aggiungi e Scarica Storico
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT REPOSITORY -->
+  <div id="modal-edit-repo" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-bg-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 data-i18n="modalEditTitle" class="text-base font-semibold text-white">Opzioni Repository</h3>
+        <button onclick="closeEditRepoModal()" class="text-slate-400 hover:text-white">&times;</button>
+      </div>
+      <form id="form-edit-repo" class="space-y-4">
+        <div class="space-y-3">
+          <div>
+            <label data-i18n="lblCategory" class="block text-xs font-medium text-slate-300 mb-1">Categoria (clicca una delle tue categorie o scrivi nuova)</label>
+            <div id="edit-category-quick-picks" class="flex flex-wrap gap-1.5 mb-2"></div>
+            <input type="text" id="edit-repo-category" list="existing-categories-datalist" class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white" />
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label data-i18n="lblTags" class="block text-xs font-medium text-slate-300">Tag (svuota per rigenerarli in automatico)</label>
+              <button type="button" onclick="document.getElementById('edit-repo-tags').value=''" class="text-[11px] text-indigo-400 hover:underline">✨ Auto-Tag</button>
+            </div>
+            <input type="text" id="edit-repo-tags" class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white" />
+          </div>
+        </div>
+        <div>
+          <label data-i18n="lblAssetFilter" class="block text-xs font-medium text-slate-300 mb-1">Filtro File (Regex opzionale)</label>
+          <input type="text" id="edit-repo-filter" class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white font-mono" />
+        </div>
+        <div class="space-y-2.5">
+          <label class="flex items-start gap-2.5 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/25 text-xs text-slate-200 cursor-pointer hover:bg-indigo-500/15 transition">
+            <input type="checkbox" id="edit-repo-only-latest" class="mt-0.5 rounded bg-bg-950 border-slate-700 text-indigo-600" />
+            <div>
+              <div data-i18n="chkOnlyLatestTitle" class="font-semibold text-indigo-300">⚡ Scarica solo l'ULTIMA release e le successive future</div>
+              <div data-i18n="chkOnlyLatestSub" class="text-[11px] text-slate-400 mt-0.5">Se attivato, ignora le vecchie versioni precedenti.</div>
+            </div>
+          </label>
+          <label class="flex items-center gap-2.5 text-xs text-slate-300 cursor-pointer">
+            <input type="checkbox" id="edit-repo-prerelease" class="rounded bg-bg-950 border-slate-700 text-indigo-600" />
+            <span data-i18n="chkIncludePrerelease">Scarica sia Stable che Pre-release / Beta</span>
+          </label>
+          <label class="flex items-center gap-2.5 text-xs text-slate-300 cursor-pointer">
+            <input type="checkbox" id="edit-repo-source" class="rounded bg-bg-950 border-slate-700 text-indigo-600" />
+            <span data-i18n="chkDownloadSource">Scarica anche Codice Sorgente (.zip / .tar.gz)</span>
+          </label>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeEditRepoModal()" data-i18n="btnCancel" class="px-4 py-2 rounded-xl bg-bg-950 border border-slate-800 text-xs text-slate-300">Annulla</button>
+          <button type="submit" data-i18n="btnSaveChanges" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white">Salva Modifiche</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PURGE REPOSITORY DATA -->
+  <div id="modal-purge-data" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-bg-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-semibold text-amber-300 flex items-center gap-2">
+          <span>🧹</span>
+          <span data-i18n="modalPurgeTitle">Pulisci / Elimina Dati Repository</span>
+        </h3>
+        <button onclick="closePurgeDataModal()" class="text-slate-400 hover:text-white">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+        <p><span data-i18n="modalPurgeDesc1">Stai per eliminare tutte le versioni e i file scaricati finora per</span> <strong id="purge-repo-name" class="text-white font-mono"></strong>.</p>
+        <p data-i18n="modalPurgeDesc2" class="text-slate-400">La repository resterà salvata con le tue opzioni attuali (categoria, tag, filtro file, solo ultima release). Come vuoi procedere?</p>
+      </div>
+      <div class="space-y-2.5 pt-2">
+        <button type="button" onclick="confirmPurgeRepoData(true)"
+          class="w-full p-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center justify-between">
+          <span data-i18n="btnPurgeAndResync">🧹 Elimina tutti i dati e Riscarica Subito (con le opzioni attuali)</span>
+          <span>🔄</span>
+        </button>
+        <button type="button" onclick="confirmPurgeRepoData(false)"
+          class="w-full p-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-200 text-xs font-semibold transition flex items-center justify-between">
+          <span data-i18n="btnPurgeOnly">⏸ Solo Elimina tutti i dati (lascia la repository vuota in Pausa)</span>
+          <span>🧹</span>
+        </button>
+      </div>
+      <div class="flex justify-end pt-2 border-t border-slate-800">
+        <button type="button" onclick="closePurgeDataModal()" data-i18n="btnCancel" class="px-4 py-2 rounded-xl bg-bg-950 border border-slate-800 text-xs text-slate-300">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DELETE REPOSITORY (KEEP OR DELETE FILES) -->
+  <div id="modal-delete-repo" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-bg-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-semibold text-rose-400 flex items-center gap-2">
+          <span>🗑</span>
+          <span data-i18n="btnDeleteRepo">Elimina Repository</span>
+        </h3>
+        <button onclick="closeDeleteRepoModal()" class="text-slate-400 hover:text-white">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+        <p><span data-i18n="modalDeleteDesc1">Stai per rimuovere</span> <strong id="delete-repo-name" class="text-white font-mono"></strong>.</p>
+        <p data-i18n="modalDeleteDesc2" class="text-slate-400">Vuoi conservare sul disco i file e le patch notes già scaricati (accessibili nella sezione "🗄 Archivi Conservati" anche senza repository attiva), oppure vuoi eliminare tutto?</p>
+      </div>
+      <div class="space-y-2.5 pt-2">
+        <button type="button" onclick="confirmDeleteRepo(false)"
+          class="w-full p-3.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-200 text-xs font-semibold transition text-left space-y-1">
+          <div class="flex items-center justify-between">
+            <span data-i18n="btnDeleteKeepFiles">📦 Elimina Repository ma CONSERVA i Dati Scaricati</span>
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-500/20">★</span>
+          </div>
+          <div data-i18n="btnDeleteKeepSub" class="text-[11px] text-slate-400 font-normal">Smette di cercare aggiornamenti, ma mantiene tutti i file e le patch notes accessibili nell'Archivio Locale.</div>
+        </button>
+        <button type="button" onclick="confirmDeleteRepo(true)"
+          class="w-full p-3.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-300 text-xs font-semibold transition text-left space-y-1">
+          <div class="flex items-center justify-between">
+            <span data-i18n="btnDeleteWipeFiles">🗑 Elimina Repository + Elimina TUTTI i File dal Disco</span>
+            <span>⚠️</span>
+          </div>
+          <div data-i18n="btnDeleteWipeSub" class="text-[11px] text-slate-400 font-normal">Cancella definitivamente sia la repository che tutti i file archiviati sul server.</div>
+        </button>
+      </div>
+      <div class="flex justify-end pt-2 border-t border-slate-800">
+        <button type="button" onclick="closeDeleteRepoModal()" data-i18n="btnCancel" class="px-4 py-2 rounded-xl bg-bg-950 border border-slate-800 text-xs text-slate-300">Annulla</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FIRST-RUN SETUP WIZARD & INTERACTIVE GUIDE (10 LANGUAGES) -->
+  <div id="modal-setup-wizard" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-bg-900 border border-indigo-500/30 rounded-2xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl space-y-5 my-auto max-h-[92vh] flex flex-col">
+      <!-- Wizard Header -->
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-lg">
+            🚀
+          </div>
+          <div>
+            <h3 id="wiz-title" data-i18n="wizTitle" class="text-base sm:text-lg font-semibold text-white">Procedura Guidata & Manuale Completo — Release Vault</h3>
+            <p id="wiz-subtitle" data-i18n="wizSub" class="text-xs text-slate-400">Configurazione passo-passo di Utente, GitHub API, Nexus Mods, Bot Telegram 24/7 e Comandi</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <a href="https://www.paypal.com/paypalme/venomdrake" target="_blank" rel="noopener noreferrer"
+            class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-xs font-semibold text-amber-300 transition flex items-center gap-1.5">
+            <span>☕</span>
+            <span data-i18n="btnDonate">Supporta / Dona</span>
+          </a>
+          <select id="wiz-lang-select" onchange="changeLanguage(this.value)"
+            class="px-2.5 py-1.5 rounded-xl bg-bg-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="pt">🇧🇷 Português</option>
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="ja">🇯🇵 日本語</option>
+            <option value="ko">🇰🇷 한국어</option>
+          </select>
+          <button id="wiz-close-btn" onclick="closeSetupWizard()" class="p-1.5 rounded-lg bg-bg-950 border border-slate-800 text-slate-400 hover:text-white">&times;</button>
+        </div>
+      </div>
+
+      <!-- Stepper Indicators -->
+      <div class="grid grid-cols-5 gap-1.5 shrink-0 text-[11px] font-medium">
+        <button type="button" onclick="goToWizardStep(1)" id="wiz-tab-1" data-i18n="wizTab1" class="py-2 px-2 rounded-xl border text-center transition truncate">1. 👤 Account</button>
+        <button type="button" onclick="goToWizardStep(2)" id="wiz-tab-2" data-i18n="wizTab2" class="py-2 px-2 rounded-xl border text-center transition truncate">2. 🐙 GitHub API</button>
+        <button type="button" onclick="goToWizardStep(3)" id="wiz-tab-3" data-i18n="wizTab3" class="py-2 px-2 rounded-xl border text-center transition truncate">3. 🎮 Nexus Mods</button>
+        <button type="button" onclick="goToWizardStep(4)" id="wiz-tab-4" data-i18n="wizTab4" class="py-2 px-2 rounded-xl border text-center transition truncate">4. 🤖 Telegram Bot</button>
+        <button type="button" onclick="goToWizardStep(5)" id="wiz-tab-5" data-i18n="wizTab5" class="py-2 px-2 rounded-xl border text-center transition truncate">5. 📖 Manuale</button>
+      </div>
+
+      <!-- Step Content Container -->
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 text-xs text-slate-300">
+        <!-- STEP 1: LANGUAGE & ADMIN ACCOUNT -->
+        <div id="wiz-step-1" class="space-y-4">
+          <div class="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/25 space-y-1.5">
+            <div id="wiz-s1-banner-title" data-i18n="s1Title" class="font-semibold text-indigo-300 text-sm">Benvenuto in Release Vault!</div>
+            <p id="wiz-s1-banner-desc" data-i18n="s1Desc" class="text-slate-300 leading-relaxed">
+              Questa piattaforma privata monitora i tuoi progetti GitHub e le tue mod di Nexus Mods, scaricando e catalogando automaticamente ogni versione con file binari, codice sorgente, checksum SHA256 e Patch Notes in Markdown.
+            </p>
+          </div>
+
+          <div class="bg-bg-950 border border-slate-800 rounded-xl p-4 space-y-3">
+            <h4 id="wiz-s1-account-hdr" data-i18n="s1Hdr" class="font-semibold text-white text-sm">🔐 1. Imposta le Credenziali di Accesso Amministratore</h4>
+            <p id="wiz-s1-account-sub" data-i18n="s1Sub" class="text-slate-400">Scegli il nome utente e la password con cui proteggere l'accesso alla tua interfaccia web privata.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label data-i18n="lblUsername" class="block text-slate-400 mb-1">Username Admin</label>
+                <input type="text" id="wiz-admin-user" value="admin" placeholder="admin"
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label data-i18n="lblNewPassword" class="block text-slate-400 mb-1">Nuova Password Admin (lascia vuoto per mantenere attuale)</label>
+                <input type="password" id="wiz-admin-pass"
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: GITHUB API TOKEN -->
+        <div id="wiz-step-2" class="hidden space-y-4">
+          <div class="bg-bg-950 border border-slate-800 rounded-xl p-4 space-y-3">
+            <h4 data-i18n="s2Hdr" class="font-semibold text-white text-sm">🐙 2. Come configurare GitHub Personal Access Token (Consigliato)</h4>
+            <p data-i18n="s2Desc" class="text-slate-400 leading-relaxed">
+              Senza token, GitHub limita le richieste API a 60 all'ora. Inserendo un token gratuito il limite sale a 5.000 richieste/ora e puoi archiviare anche le tue repository private.
+            </p>
+            <div class="p-3.5 rounded-xl bg-bg-900 border border-slate-800/90 space-y-1.5 text-slate-300">
+              <div data-i18n="s2StepsTitle" class="font-semibold text-indigo-300">📋 Procedura passo-passo per ottenere il Token GitHub:</div>
+              <ol class="list-decimal list-inside space-y-1 text-slate-300">
+                <li><a href="https://github.com/settings/tokens" target="_blank" class="text-indigo-400 underline">github.com/settings/tokens</a> → <strong>Generate new token (classic)</strong>.</li>
+                <li data-i18n="s2Step2">Imposta Expiration su No expiration e spunta il permesso "repo".</li>
+                <li data-i18n="s2Step3">Clicca su Generate token e incolla qui sotto il codice che inizia con ghp_...</li>
+              </ol>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div class="sm:col-span-2">
+                <label data-i18n="lblGhToken" class="block text-slate-400 mb-1">GitHub Personal Access Token (opzionale)</label>
+                <input type="password" id="wiz-gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label data-i18n="lblCheckInterval" class="block text-slate-400 mb-1">Controllo Automatico (minuti)</label>
+                <input type="number" id="wiz-check-interval" value="60" min="5" max="1440"
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: NEXUS MODS API & SESSION COOKIE -->
+        <div id="wiz-step-3" class="hidden space-y-4">
+          <div class="bg-bg-950 border border-slate-800 rounded-xl p-4 space-y-3">
+            <h4 data-i18n="s3Hdr" class="font-semibold text-amber-300 text-sm">🎮 3. Come configurare Nexus Mods (API Key + Session Cookie)</h4>
+            <p data-i18n="s3Desc" class="text-slate-400 leading-relaxed">
+              Per scaricare automaticamente i file delle mod, lo storico versioni e i changelog da Nexus Mods (anche con un account gratuito Free!), servono 2 parametri:
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="p-3.5 rounded-xl bg-bg-900 border border-slate-800 space-y-1.5">
+                <div class="font-semibold text-amber-300">🔑 A) Personal API Key:</div>
+                <ol class="list-decimal list-inside space-y-1 text-slate-300">
+                  <li><a href="https://next.nexusmods.com/settings/api-keys" target="_blank" class="text-amber-400 underline">next.nexusmods.com/settings/api-keys</a></li>
+                  <li data-i18n="s3KeyStep">Scorri fino in fondo alla sezione Personal API Key, copia la chiave e incollala qui sotto.</li>
+                </ol>
+              </div>
+              <div class="p-3.5 rounded-xl bg-bg-900 border border-slate-800 space-y-1.5">
+                <div class="font-semibold text-amber-300">🍪 B) Cookie <code>nexusmods_session</code>:</div>
+                <ol class="list-decimal list-inside space-y-1 text-slate-300">
+                  <li><a href="https://www.nexusmods.com" target="_blank" class="text-amber-400 underline">nexusmods.com</a> → <strong><code>F12</code></strong> (DevTools).</li>
+                  <li data-i18n="s3CookieStep">Application / Storage → Cookies → copia il valore di nexusmods_session.</li>
+                </ol>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div>
+                <label data-i18n="lblNexusUser" class="block text-slate-400 mb-1">Username Nexus Mods</label>
+                <input type="text" id="wiz-nexus-user" placeholder="Username"
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Personal API Key</label>
+                <input type="password" id="wiz-nexus-apikey" placeholder="Personal API Key..."
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Cookie <code>nexusmods_session</code></label>
+                <input type="password" id="wiz-nexus-session" placeholder="nexusmods_session..."
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: TELEGRAM BOT 24/7 SETUP -->
+        <div id="wiz-step-4" class="hidden space-y-4">
+          <div class="bg-bg-950 border border-slate-800 rounded-xl p-4 space-y-3">
+            <h4 data-i18n="s4Hdr" class="font-semibold text-sky-300 text-sm">🤖 4. Come creare e blindare il tuo Bot Telegram Personale 24/7</h4>
+            <p data-i18n="s4Desc" class="text-slate-400 leading-relaxed">
+              Il Vault include un servizio Bot Telegram attivo 24/7 che risponde esclusivamente al tuo Telegram User ID (bloccando chiunque altro), invia notifiche con le Patch Notes e ti permette di aggiungere link GitHub o Nexus Mods direttamente dalla chat!
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="p-3.5 rounded-xl bg-bg-900 border border-slate-800 space-y-1.5">
+                <div class="font-semibold text-sky-300">1️⃣ @BotFather:</div>
+                <ol class="list-decimal list-inside space-y-1 text-slate-300">
+                  <li><a href="https://t.me/BotFather" target="_blank" class="text-sky-400 underline">@BotFather</a> → <code>/newbot</code></li>
+                  <li data-i18n="s4BotStep">Copia il Token HTTP API (es. 123456:AAH...) e incollalo qui sotto.</li>
+                </ol>
+              </div>
+              <div class="p-3.5 rounded-xl bg-bg-900 border border-slate-800 space-y-1.5">
+                <div class="font-semibold text-sky-300">2️⃣ @userinfobot (Telegram User ID):</div>
+                <ol class="list-decimal list-inside space-y-1 text-slate-300">
+                  <li><a href="https://t.me/userinfobot" target="_blank" class="text-sky-400 underline">@userinfobot</a> → Start</li>
+                  <li data-i18n="s4IdStep">Copia il tuo numero Id: il bot risponderà solo ed esclusivamente a te!</li>
+                </ol>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div>
+                <label class="block text-slate-400 mb-1">Telegram Bot Token</label>
+                <input type="text" id="wiz-tg-token" placeholder="123456789:AAF..."
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Telegram User ID</label>
+                <input type="text" id="wiz-tg-chat" placeholder="123456789"
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500" />
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Discord Webhook</label>
+                <input type="text" id="wiz-discord-webhook" placeholder="https://discord.com/api/webhooks/..."
+                  class="w-full px-3 py-2 bg-bg-900 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-indigo-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: COMPLETE MANUAL OF COMMANDS & FEATURES -->
+        <div id="wiz-step-5" class="hidden space-y-3">
+          <div class="bg-bg-950 border border-slate-800 rounded-xl p-4 space-y-3">
+            <h4 data-i18n="s5Hdr" class="font-semibold text-emerald-300 text-sm">📖 5. Guida Completa ai Comandi e alle Funzionalità</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="p-3 rounded-xl bg-bg-900 border border-slate-800 space-y-1">
+                <div data-i18n="s5Card1Title" class="font-semibold text-white">✨ Auto-Tag & Memoria Categorie</div>
+                <p data-i18n="s5Card1Desc" class="text-slate-400">Incollando un link GitHub o Nexus Mods, il sistema genera in automatico Categoria e Tag e ricorda le tue categorie con pulsanti rapidi.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-bg-900 border border-slate-800 space-y-1">
+                <div data-i18n="s5Card2Title" class="font-semibold text-white">⚡ Solo Ultima + Future vs 📚 Storico</div>
+                <p data-i18n="s5Card2Desc" class="text-slate-400">Scegli per ogni repo se scaricare tutto lo storico passato oppure solo l'ULTIMA release e le successive future.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-bg-900 border border-slate-800 space-y-1">
+                <div data-i18n="s5Card3Title" class="font-semibold text-white">⏸ Pausa Globale e Pausa Singola Repo</div>
+                <p data-i18n="s5Card3Desc" class="text-slate-400">Metti in pausa tutti i download col tasto Pausa Tutto, oppure metti in pausa una singola repository lasciando attive le altre.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-bg-900 border border-slate-800 space-y-1">
+                <div data-i18n="s5Card4Title" class="font-semibold text-white">🧹 Elimina Dati & 🗄 Archivi Conservati</div>
+                <p data-i18n="s5Card4Desc" class="text-slate-400">Con Elimina Dati svuoti i file di una repo e riparti con nuove opzioni. Quando elimini una repo puoi scegliere di Conservare i file ed esplorarli anche senza repo attiva!</p>
+              </div>
+            </div>
+            <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/25 space-y-1">
+              <div data-i18n="s5BotTitle" class="font-semibold text-indigo-300">🤖 Comandi del Bot Telegram (/menu, /status, /sync):</div>
+              <p data-i18n="s5BotDesc" class="text-slate-300 leading-relaxed">
+                Usa /menu o /start per la Dashboard interattiva, /status per lo stato dei download e del disco, /sync per controllare aggiornamenti, oppure incolla direttamente qualsiasi link GitHub o Nexus Mods in chat!
+              </p>
+            </div>
+            <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div data-i18n="donateBannerTitle" class="font-semibold text-amber-300">☕ Ti piace Release Vault? Supporta il progetto!</div>
+                <div data-i18n="donateBannerDesc" class="text-slate-300 text-[11px]">Se questo progetto ti è utile, puoi supportare lo sviluppo con una donazione su PayPal.</div>
+              </div>
+              <a href="https://www.paypal.com/paypalme/venomdrake" target="_blank" rel="noopener noreferrer"
+                class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20">
+                <span>☕</span>
+                <span data-i18n="btnDonate">Supporta / Dona</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wizard Footer Navigation -->
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800 shrink-0">
+        <button type="button" id="wiz-btn-prev" data-i18n="prev" onclick="prevWizardStep()"
+          class="px-4 py-2 rounded-xl bg-bg-950 hover:bg-slate-800 border border-slate-800 text-xs font-medium text-slate-300 transition">
+          ← Indietro
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" id="wiz-btn-next" data-i18n="next" onclick="nextWizardStep()"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white shadow-lg shadow-indigo-600/20 transition">
+            Avanti →
+          </button>
+          <button type="button" id="wiz-btn-finish" data-i18n="finish" onclick="completeSetupWizard()"
+            class="hidden px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 transition">
+            ✅ Salva e Avvia il Vault
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- APPLICATION STATE ---
+    let currentTab = 'repos';
+    let reposList = [];
+    let detachedList = [];
+    let selectedCategory = '';
+    let currentRepoDetail = null; // { repository: {...}, releases: [...], is_detached?: boolean }
+    let selectedReleaseId = null;
+    let showRawMarkdown = false;
+    let feedDebounceTimer = null;
+    let pollTimer = null;
+    let globalPaused = false;
+
+    function updateGlobalPauseUI(isPaused) {
+      globalPaused = !!isPaused;
+      const btn = document.getElementById('btn-pause-global');
+      const icon = document.getElementById('pause-global-icon');
+      const label = document.getElementById('pause-global-label');
+      const banner = document.getElementById('global-pause-banner');
+      const t = (typeof I18N !== 'undefined' && typeof currentLang !== 'undefined' && I18N[currentLang]) ? I18N[currentLang] : {};
+      if (globalPaused) {
+        if (btn) btn.className = 'px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-xs font-semibold text-amber-300 transition flex items-center gap-1.5';
+        if (icon) icon.textContent = '▶️';
+        if (label) label.textContent = t.resumeAll || 'Riprendi Tutto';
+        if (banner) banner.classList.remove('hidden');
+      } else {
+        if (btn) btn.className = 'px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-amber-500/20 border border-slate-700/80 hover:border-amber-500/40 text-xs font-medium text-slate-200 transition flex items-center gap-1.5';
+        if (icon) icon.textContent = '⏸';
+        if (label) label.textContent = t.pauseAll || 'Pausa Tutto';
+        if (banner) banner.classList.add('hidden');
+      }
+    }
+
+    // --- UTILITIES ---
+    function formatBytes(bytes) {
+      if (!bytes || bytes <= 0) return '0 B';
+      const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      return (bytes / Math.pow(1024, i)).toFixed(i > 1 ? 2 : 0) + ' ' + units[i];
+    }
+
+    function formatDate(iso) {
+      if (!iso) return 'N/D';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch {
+        return iso;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]));
+    }
+
+    function renderMarkdown(md) {
+      if (!md || !md.trim()) {
+        return '<p class="italic text-slate-500">Nessuna nota di rilascio (patch notes) fornita su GitHub per questa versione.</p>';
+      }
+      try {
+        const rawHtml = marked.parse(md, { breaks: true, gfm: true });
+        return DOMPurify.sanitize(rawHtml);
+      } catch {
+        return '<pre>' + escapeHtml(md) + '</pre>';
+      }
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      const colors = {
+        info: 'border-indigo-500/40 bg-bg-900 text-slate-200',
+        success: 'border-emerald-500/40 bg-bg-900 text-emerald-300',
+        error: 'border-rose-500/40 bg-bg-900 text-rose-300',
+      };
+      el.className = `pointer-events-auto border ${colors[type] || colors.info} px-4 py-3 rounded-xl shadow-xl text-xs font-medium flex items-center justify-between gap-3 transition-all`;
+      el.innerHTML = `<span>${escapeHtml(msg)}</span><button onclick="this.parentElement.remove()" class="text-slate-500 hover:text-white">&times;</button>`;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4500);
+    }
+
+    async function apiFetch(url, options = {}) {
+      const resp = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(options.headers || {}),
+        }
+      });
+      if (resp.status === 401) {
+        showLogin();
+        throw new Error('Non autenticato');
+      }
+      if (!resp.ok) {
+        let errText = 'Errore richiesta';
+        try {
+          const data = await resp.json();
+          errText = data.detail || errText;
+        } catch {}
+        throw new Error(errText);
+      }
+      return resp.json();
+    }
+
+    // --- AUTH FLOW ---
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (data.language) {
+          applyLanguageUI(data.language);
+        }
+        if (data.authenticated) {
+          showApp(!data.setup_completed);
+        } else {
+          showLogin();
+        }
+      } catch {
+        showLogin();
+      }
+    }
+
+    function showLogin() {
+      if (pollTimer) clearInterval(pollTimer);
+      document.getElementById('app-view').classList.add('hidden');
+      document.getElementById('login-view').classList.remove('hidden');
+    }
+
+    function showApp(launchWizard = false) {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('app-view').classList.remove('hidden');
+      switchTab(currentTab);
+      refreshAll();
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(pollBackgroundStatus, 4000);
+      if (launchWizard) {
+        openSetupWizard(true);
+      }
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById('login-error');
+      errBox.classList.add('hidden');
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      try {
+        const resp = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!resp.ok) {
+          errBox.textContent = 'Username o password errati.';
+          errBox.classList.remove('hidden');
+          return;
+        }
+        const data = await resp.json();
+        if (data.language) applyLanguageUI(data.language);
+        showApp(!data.setup_completed);
+      } catch (err) {
+        errBox.textContent = 'Errore di connessione al server.';
+        errBox.classList.remove('hidden');
+      }
+    });
+
+    async function logout() {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      showLogin();
+    }
+
+    // --- NAVIGATION ---
+    function switchTab(tab) {
+      currentTab = tab;
+      ['repos', 'feed', 'activity', 'settings'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tab) {
+          view.classList.remove('hidden');
+          if (btn) btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-medium transition bg-indigo-600 text-white shadow';
+        } else {
+          view.classList.add('hidden');
+          if (btn) btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-medium transition text-slate-400 hover:text-white';
+        }
+      });
+
+      if (tab === 'repos') {
+        loadRepos();
+      } else if (tab === 'feed') {
+        loadGlobalFeed();
+      } else if (tab === 'activity') {
+        refreshOverview();
+      } else if (tab === 'settings') {
+        loadSettings();
+      }
+    }
+
+    async function refreshAll() {
+      await Promise.all([refreshOverview(), loadRepos()]);
+    }
+
+    async function pollBackgroundStatus() {
+      try {
+        await refreshOverview();
+        if (currentTab === 'repos') {
+          if (currentRepoDetail) {
+            if (!currentRepoDetail.is_detached) {
+              await openRepoDetail(currentRepoDetail.repository.id, true);
+            }
+          } else {
+            await loadRepos();
+          }
+        }
+      } catch {}
+    }
+
+    // --- OVERVIEW & STATS ---
+    async function refreshOverview() {
+      const data = await apiFetch('/api/overview');
+      updateGlobalPauseUI(data.global_paused);
+      document.getElementById('stat-repos').textContent = data.repositories_count;
+      document.getElementById('stat-releases').textContent = `${data.completed_releases} / ${data.total_releases}`;
+      document.getElementById('stat-assets').textContent = `${data.completed_assets} ${tr('filesDownloaded')}`;
+      document.getElementById('stat-archive-size').textContent = formatBytes(data.archive_bytes);
+
+      const usedPct = Math.min(100, Math.max(2, Math.round((data.disk_used / data.disk_total) * 100)));
+      document.getElementById('stat-disk-free').textContent = `${formatBytes(data.disk_free)} ${tr('freeSpace')}`;
+      document.getElementById('stat-disk-bar').style.width = `${usedPct}%`;
+      document.getElementById('stat-disk-detail').textContent = `${tr('usedSpace')} ${formatBytes(data.disk_used)} / ${formatBytes(data.disk_total)}`;
+
+      if (data.global_paused) {
+        document.getElementById('stat-last-check').textContent = `⏸ ${tr('pauseAll')}`;
+      } else if (data.last_check_time) {
+        document.getElementById('stat-last-check').textContent = `${tr('lastCheck')}: ${formatDate(data.last_check_time)}`;
+      }
+
+      // Active downloads banner & badge
+      const totalJobs = data.queue_size + (data.active_downloads ? data.active_downloads.length : 0);
+      const navBadge = document.getElementById('nav-queue-badge');
+      const banner = document.getElementById('active-download-banner');
+
+      if (totalJobs > 0) {
+        navBadge.textContent = totalJobs;
+        navBadge.classList.remove('hidden');
+        banner.classList.remove('hidden');
+        if (data.active_downloads && data.active_downloads.length > 0) {
+          const d = data.active_downloads[0];
+          document.getElementById('banner-dl-text').textContent =
+            `${d.repo_full_name} [${d.tag_name}] - ${d.current_file || '...'} (${formatBytes(d.bytes_downloaded)})`;
+        } else {
+          document.getElementById('banner-dl-text').textContent = `...`;
+        }
+        document.getElementById('banner-queue-count').textContent = `${totalJobs} ${tr('inQueue')}`;
+      } else {
+        navBadge.classList.add('hidden');
+        banner.classList.add('hidden');
+      }
+
+      // Update Activity Tab if visible
+      document.getElementById('activity-queue-pill').textContent = `${totalJobs} ${tr('inQueue')}`;
+      const activeBox = document.getElementById('active-downloads-list');
+      if (data.active_downloads && data.active_downloads.length > 0) {
+        activeBox.innerHTML = data.active_downloads.map(d => `
+          <div class="p-3 bg-bg-950 border border-indigo-500/30 rounded-xl flex items-center justify-between gap-4">
+            <div>
+              <div class="font-semibold text-white">${escapeHtml(d.repo_full_name)} <span class="text-indigo-400 font-mono">${escapeHtml(d.tag_name)}</span></div>
+              <div class="text-slate-400 mt-0.5">File: <span class="font-mono text-slate-200">${escapeHtml(d.current_file || '...')}</span> (${d.completed_files}/${d.total_files})</div>
+            </div>
+            <div class="font-mono text-indigo-300 font-medium">${formatBytes(d.bytes_downloaded)}</div>
+          </div>
+        `).join('');
+      } else {
+        activeBox.innerHTML = `<div class="text-slate-500 py-2">${tr('noActiveDl')}</div>`;
+      }
+
+      const logsBox = document.getElementById('activity-logs-list');
+      if (data.recent_logs && data.recent_logs.length > 0) {
+        logsBox.innerHTML = data.recent_logs.map(l => {
+          const color = l.level === 'error' ? 'text-rose-400' : (l.level === 'warning' ? 'text-amber-400' : (l.level === 'success' ? 'text-emerald-400' : 'text-slate-300'));
+          return `
+            <div class="py-1.5 px-2.5 rounded-lg bg-bg-950/70 border border-slate-800/60 flex flex-wrap items-center gap-2">
+              <span class="text-slate-500">${formatDate(l.created_at)}</span>
+              ${l.repo_name ? `<span class="px-1.5 py-0.2 rounded bg-slate-800 text-indigo-300">${escapeHtml(l.repo_name)}</span>` : ''}
+              <span class="${color}">${escapeHtml(l.message)}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // --- REPOSITORIES LIST & FILTERING ---
+    async function loadRepos() {
+      const [repos, detached] = await Promise.all([
+        apiFetch('/api/repos'),
+        apiFetch('/api/detached-archives').catch(() => []),
+      ]);
+      reposList = repos;
+      detachedList = detached || [];
+      renderCategoryPills();
+      renderReposGrid();
+      renderDetachedArchivesGrid();
+    }
+
+    function renderCategoryPills() {
+      const cats = Array.from(new Set(reposList.map(r => r.category).filter(Boolean)));
+      const box = document.getElementById('category-pills');
+      const allBtnClass = selectedCategory === ''
+        ? 'bg-indigo-600 text-white'
+        : 'bg-bg-950 text-slate-400 hover:text-white border border-slate-800';
+
+      let html = `<button onclick="selectCategory('')" class="px-3 py-1.5 rounded-xl text-xs font-medium transition whitespace-nowrap ${allBtnClass}">${tr('allFilter')} (${reposList.length})</button>`;
+      for (const c of cats) {
+        const active = selectedCategory === c
+          ? 'bg-indigo-600 text-white'
+          : 'bg-bg-950 text-slate-400 hover:text-white border border-slate-800';
+        html += `<button onclick="selectCategory('${escapeHtml(c)}')" class="px-3 py-1.5 rounded-xl text-xs font-medium transition whitespace-nowrap ${active}">${escapeHtml(c)}</button>`;
+      }
+      if (detachedList.length > 0) {
+        const detActive = selectedCategory === '__DETACHED__'
+          ? 'bg-amber-600 text-white border border-amber-500'
+          : 'bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 border border-amber-500/30';
+        html += `<button onclick="selectCategory('__DETACHED__')" class="px-3 py-1.5 rounded-xl text-xs font-medium transition whitespace-nowrap ${detActive}">🗄 ${tr('detachedPill')} (${detachedList.length})</button>`;
+      }
+      box.innerHTML = html;
+    }
+
+    function selectCategory(cat) {
+      selectedCategory = cat;
+      renderCategoryPills();
+      renderReposGrid();
+      renderDetachedArchivesGrid();
+    }
+
+    function renderDetachedArchivesGrid() {
+      const section = document.getElementById('detached-archives-section');
+      const grid = document.getElementById('detached-archives-grid');
+      const badge = document.getElementById('detached-count-badge');
+      if (!section || !grid) return;
+
+      const q = (document.getElementById('repo-search-input').value || '').toLowerCase().trim();
+      const filteredDetached = detachedList.filter(d => {
+        if (!q) return true;
+        return (
+          (d.full_name || '').toLowerCase().includes(q) ||
+          (d.name || '').toLowerCase().includes(q) ||
+          (d.category || '').toLowerCase().includes(q) ||
+          (d.tags || '').toLowerCase().includes(q)
+        );
+      });
+
+      if (filteredDetached.length === 0 || (selectedCategory && selectedCategory !== '__DETACHED__')) {
+        section.classList.add('hidden');
+        return;
+      }
+
+      section.classList.remove('hidden');
+      if (badge) badge.textContent = filteredDetached.length;
+
+      grid.innerHTML = filteredDetached.map(r => {
+        const isNexus = (r.provider || 'github') === 'nexusmods';
+        const sourceBadge = isNexus
+          ? `<span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold">NEXUS MODS</span>`
+          : `<span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">GITHUB</span>`;
+
+        const tagsHtml = (r.tags || '').split(',').map(t => t.trim()).filter(Boolean).map(t =>
+          `<span class="text-[10px] px-2 py-0.5 rounded-md bg-bg-950 border border-slate-800 text-slate-400">#${escapeHtml(t)}</span>`
+        ).join('');
+
+        return `
+          <div onclick="openDetachedArchiveDetail('${escapeHtml(r.folder_name)}')"
+            class="group bg-bg-900 hover:bg-bg-800/90 border border-amber-500/30 hover:border-amber-400/60 rounded-2xl p-5 cursor-pointer transition-all flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <img src="${escapeHtml(r.avatar_url || 'https://github.com/identicons/github.png')}" alt=""
+                    class="w-10 h-10 rounded-xl bg-bg-950 border border-slate-700 object-cover shrink-0" />
+                  <div class="min-w-0">
+                    <div class="text-xs text-slate-400 truncate">${escapeHtml(r.owner)}</div>
+                    <h3 class="text-base font-semibold text-white group-hover:text-amber-300 transition truncate">${escapeHtml(r.name)}</h3>
+                  </div>
+                </div>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0">🗄 ${tr('detachedPill')}</span>
+              </div>
+
+              <p class="text-xs text-slate-400 line-clamp-2 min-h-[2.25rem]">${escapeHtml(r.description)}</p>
+
+              <div class="flex flex-wrap items-center gap-1.5 mt-3">
+                ${sourceBadge}
+                <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/25">${escapeHtml(r.category || 'Archivio')}</span>
+                ${tagsHtml}
+              </div>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-3">
+                <div>
+                  <span class="text-slate-500">${tr('lblVersions')}:</span>
+                  <span class="font-semibold text-white ml-1">${r.releases_count || 0}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500">${tr('lblSpace')}:</span>
+                  <span class="font-mono text-slate-300 ml-1">${formatBytes(r.repo_total_size)}</span>
+                </div>
+              </div>
+              <div class="font-mono text-xs px-2 py-0.5 rounded bg-bg-950 border border-slate-800 text-amber-300 truncate max-w-[120px]">
+                ${escapeHtml(r.latest_tag || '')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderReposGrid() {
+      const grid = document.getElementById('repos-grid');
+      if (selectedCategory === '__DETACHED__') {
+        grid.innerHTML = '';
+        renderDetachedArchivesGrid();
+        return;
+      }
+
+      const q = (document.getElementById('repo-search-input').value || '').toLowerCase().trim();
+      const filtered = reposList.filter(r => {
+        if (selectedCategory && r.category !== selectedCategory) return false;
+        if (!q) return true;
+        return (
+          r.full_name.toLowerCase().includes(q) ||
+          (r.description || '').toLowerCase().includes(q) ||
+          (r.tags || '').toLowerCase().includes(q) ||
+          (r.category || '').toLowerCase().includes(q) ||
+          (r.latest_tag || '').toLowerCase().includes(q)
+        );
+      });
+
+      if (filtered.length === 0) {
+        if (detachedList.length > 0 && !selectedCategory && !q) {
+          grid.innerHTML = '';
+          renderDetachedArchivesGrid();
+          return;
+        }
+        grid.innerHTML = `
+          <div class="col-span-full bg-bg-900/60 border border-dashed border-slate-800 rounded-2xl p-12 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mx-auto flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+            </div>
+            <div class="text-base font-medium text-white">${tr('noReposTitle')}</div>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">${tr('noReposSub')}</p>
+            <button onclick="openAddRepoModal()" class="mt-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white transition">
+              + ${tr('btnAddSource')}
+            </button>
+          </div>
+        `;
+        renderDetachedArchivesGrid();
+        return;
+      }
+
+      grid.innerHTML = filtered.map(r => {
+        const isNexus = (r.provider || 'github') === 'nexusmods';
+        const sourceBadge = isNexus
+          ? `<span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold">NEXUS MODS</span>`
+          : `<span class="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">GITHUB</span>`;
+
+        const isPaused = !!r.paused || r.status === 'paused';
+        let statusBadge = `<span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">✓ ${tr('stReady')}</span>`;
+        if (isPaused) {
+          statusBadge = `<span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">⏸ ${tr('stPaused')}</span>`;
+        } else if (r.status === 'downloading' || r.status === 'checking') {
+          statusBadge = `<span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 animate-pulse">⚡ ${tr('stSyncing')}</span>`;
+        } else if (r.status === 'error') {
+          statusBadge = `<span title="${escapeHtml(r.error_message || '')}" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30">⚠️ ${tr('stError')}</span>`;
+        } else if ((r.completed_releases_count || 0) < (r.releases_count || 0)) {
+          statusBadge = `<span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">⚠️ ${tr('stPartial')} (${r.completed_releases_count || 0}/${r.releases_count || 0})</span>`;
+        }
+
+        const errBannerHtml = (r.status === 'error' && r.error_message)
+          ? `<div class="mt-2.5 text-[11px] text-rose-300 bg-rose-500/10 border border-rose-500/25 rounded-lg px-2.5 py-1.5 line-clamp-2">⚠️ ${escapeHtml(r.error_message)}</div>`
+          : '';
+
+        const pauseBtnClass = isPaused
+          ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border-amber-500/40'
+          : 'bg-bg-950 hover:bg-slate-800 text-slate-300 border-slate-800';
+        const pauseBtnText = isPaused ? `▶️ ${tr('btnResumeShort')}` : `⏸ ${tr('btnPauseShort')}`;
+
+        const tagsHtml = (r.tags || '').split(',').map(t => t.trim()).filter(Boolean).map(t =>
+          `<span class="text-[10px] px-2 py-0.5 rounded-md bg-bg-950 border border-slate-800 text-slate-400">#${escapeHtml(t)}</span>`
+        ).join('');
+
+        return `
+          <div onclick="openRepoDetail(${r.id})"
+            class="group bg-bg-900 hover:bg-bg-800/90 border ${isPaused ? 'border-amber-500/30' : 'border-slate-800/80'} hover:border-indigo-500/50 rounded-2xl p-5 cursor-pointer transition-all flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="flex items-start justify-between gap-3 mb-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <img src="${escapeHtml(r.avatar_url || 'https://github.com/identicons/github.png')}" alt=""
+                    class="w-10 h-10 rounded-xl bg-bg-950 border border-slate-700 object-cover shrink-0" />
+                  <div class="min-w-0">
+                    <div class="text-xs text-slate-400 truncate">${escapeHtml(r.owner)}</div>
+                    <h3 class="text-base font-semibold text-white group-hover:text-indigo-300 transition truncate">${escapeHtml(r.name)}</h3>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  ${statusBadge}
+                  <button onclick="toggleRepoPause(${r.id}, event)"
+                    class="px-2 py-0.5 rounded-lg border text-[11px] font-medium transition ${pauseBtnClass}">
+                    ${pauseBtnText}
+                  </button>
+                </div>
+              </div>
+
+              <p class="text-xs text-slate-400 line-clamp-2 min-h-[2.25rem]">${escapeHtml(r.description || '')}</p>
+              ${errBannerHtml}
+
+              <div class="flex flex-wrap items-center gap-1.5 mt-3">
+                ${sourceBadge}
+                <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/25">${escapeHtml(r.category || 'Generale')}</span>
+                ${tagsHtml}
+              </div>
+            </div>
+
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-3">
+                <div>
+                  <span class="text-slate-500">${tr('lblVersions')}:</span>
+                  <span class="font-semibold text-white ml-1">${r.completed_releases_count || 0}/${r.releases_count || 0}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500">${tr('lblSpace')}:</span>
+                  <span class="font-mono text-slate-300 ml-1">${formatBytes(r.repo_total_size)}</span>
+                </div>
+              </div>
+              <div class="font-mono text-xs px-2 py-0.5 rounded bg-bg-950 border border-slate-800 text-indigo-300 truncate max-w-[120px]">
+                ${escapeHtml(r.latest_tag || '...')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      renderDetachedArchivesGrid();
+    }
+
+    // --- REPOSITORY DETAIL VIEW (VERSIONS + PATCH NOTES + ASSETS) ---
+    async function openRepoDetail(repoId, silent = false) {
+      const data = await apiFetch(`/api/repos/${repoId}/releases`);
+      data.is_detached = false;
+      currentRepoDetail = data;
+
+      document.getElementById('repos-grid-section').classList.add('hidden');
+      document.getElementById('repo-detail-section').classList.remove('hidden');
+
+      const repo = data.repository;
+      const isNexus = (repo.provider === 'nexusmods') || (repo.html_url || '').includes('nexusmods.com');
+      document.getElementById('detail-repo-avatar').src = repo.avatar_url || 'https://github.com/identicons/github.png';
+      document.getElementById('detail-repo-title').textContent = isNexus && repo.name ? `${repo.name} (${repo.full_name})` : repo.full_name;
+      document.getElementById('detail-repo-category').textContent = repo.category || 'Generale';
+      document.getElementById('detail-detached-badge').classList.add('hidden');
+
+      ['btn-detail-pause', 'btn-detail-sync', 'btn-detail-edit', 'btn-detail-purge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('hidden');
+      });
+      const delBtn = document.getElementById('btn-detail-delete');
+      if (delBtn) delBtn.textContent = 'Elimina Repo';
+
+      const ghLink = document.getElementById('detail-repo-ghlink');
+      const providerLabel = document.getElementById('detail-repo-provider-label');
+      ghLink.href = repo.html_url;
+      if (isNexus) {
+        providerLabel.textContent = 'Nexus Mods';
+        ghLink.className = 'text-xs text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1';
+      } else {
+        providerLabel.textContent = 'GitHub';
+        ghLink.className = 'text-xs text-slate-400 hover:text-indigo-400 flex items-center gap-1';
+      }
+      document.getElementById('detail-repo-desc').textContent = repo.description || '';
+      const errBox = document.getElementById('detail-repo-error');
+      if (errBox) {
+        if (repo.status === 'error' && repo.error_message) {
+          errBox.textContent = `⚠️ Motivo Errore: ${repo.error_message}`;
+          errBox.classList.remove('hidden');
+        } else {
+          errBox.classList.add('hidden');
+        }
+      }
+
+      const isRepoPaused = !!repo.paused || repo.status === 'paused';
+      const detailPauseBtn = document.getElementById('btn-detail-pause');
+      const detailPauseIcon = document.getElementById('detail-pause-icon');
+      const detailPauseLabel = document.getElementById('detail-pause-label');
+      if (detailPauseBtn) {
+        if (isRepoPaused) {
+          detailPauseBtn.className = 'px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-xs font-semibold text-amber-300 border border-amber-500/50 transition flex items-center gap-1.5';
+          if (detailPauseIcon) detailPauseIcon.textContent = '▶️';
+          if (detailPauseLabel) detailPauseLabel.textContent = 'Riprendi Repo';
+        } else {
+          detailPauseBtn.className = 'px-3 py-2 rounded-xl bg-slate-800 hover:bg-amber-500/20 text-xs font-medium text-slate-200 border border-slate-700 hover:border-amber-500/40 transition flex items-center gap-1.5';
+          if (detailPauseIcon) detailPauseIcon.textContent = '⏸';
+          if (detailPauseLabel) detailPauseLabel.textContent = 'Pausa Repo';
+        }
+      }
+
+      if (!silent || !selectedReleaseId || !data.releases.some(r => r.id === selectedReleaseId)) {
+        selectedReleaseId = data.releases.length > 0 ? data.releases[0].id : null;
+      }
+
+      renderRepoVersionsList();
+      renderSelectedReleaseInspector();
+    }
+
+    async function openDetachedArchiveDetail(folderName) {
+      const data = await apiFetch(`/api/detached-archives/${encodeURIComponent(folderName)}/releases`);
+      data.is_detached = true;
+      currentRepoDetail = data;
+
+      document.getElementById('repos-grid-section').classList.add('hidden');
+      document.getElementById('repo-detail-section').classList.remove('hidden');
+
+      const repo = data.repository;
+      const isNexus = (repo.provider === 'nexusmods') || (repo.html_url || '').includes('nexusmods.com');
+      document.getElementById('detail-repo-avatar').src = repo.avatar_url || 'https://github.com/identicons/github.png';
+      document.getElementById('detail-repo-title').textContent = isNexus && repo.name ? `${repo.name} (${repo.full_name})` : repo.full_name;
+      document.getElementById('detail-repo-category').textContent = repo.category || 'Archivio';
+      document.getElementById('detail-detached-badge').classList.remove('hidden');
+
+      ['btn-detail-pause', 'btn-detail-sync', 'btn-detail-edit', 'btn-detail-purge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      const delBtn = document.getElementById('btn-detail-delete');
+      if (delBtn) delBtn.textContent = '🗑 Elimina Dati dal Disco';
+
+      const ghLink = document.getElementById('detail-repo-ghlink');
+      const providerLabel = document.getElementById('detail-repo-provider-label');
+      ghLink.href = repo.html_url || '#';
+      if (isNexus) {
+        providerLabel.textContent = 'Nexus Mods';
+        ghLink.className = 'text-xs text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1';
+      } else {
+        providerLabel.textContent = 'GitHub';
+        ghLink.className = 'text-xs text-slate-400 hover:text-indigo-400 flex items-center gap-1';
+      }
+      document.getElementById('detail-repo-desc').textContent = repo.description || '';
+      const errBox = document.getElementById('detail-repo-error');
+      if (errBox) {
+        if (repo.status === 'error' && repo.error_message) {
+          errBox.textContent = `⚠️ Motivo Errore: ${repo.error_message}`;
+          errBox.classList.remove('hidden');
+        } else {
+          errBox.classList.add('hidden');
+        }
+      }
+
+      selectedReleaseId = data.releases.length > 0 ? data.releases[0].id : null;
+      renderRepoVersionsList();
+      renderSelectedReleaseInspector();
+    }
+
+    function closeRepoDetail() {
+      currentRepoDetail = null;
+      selectedReleaseId = null;
+      document.getElementById('repo-detail-section').classList.add('hidden');
+      document.getElementById('repos-grid-section').classList.remove('hidden');
+      loadRepos();
+    }
+
+    function renderRepoVersionsList() {
+      if (!currentRepoDetail) return;
+      const channel = document.getElementById('detail-channel-filter').value;
+      const q = (document.getElementById('detail-version-search').value || '').toLowerCase().trim();
+
+      const filtered = currentRepoDetail.releases.filter(rel => {
+        if (channel === 'stable' && rel.prerelease) return false;
+        if (channel === 'prerelease' && !rel.prerelease) return false;
+        if (!q) return true;
+        return (
+          (rel.tag_name || '').toLowerCase().includes(q) ||
+          (rel.name || '').toLowerCase().includes(q) ||
+          (rel.body || '').toLowerCase().includes(q)
+        );
+      });
+
+      const listEl = document.getElementById('detail-versions-list');
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="text-xs text-slate-500 text-center py-8">Nessuna release trovata con questi filtri.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(rel => {
+        const isSelected = String(rel.id) === String(selectedReleaseId);
+        const activeCls = isSelected
+          ? 'bg-indigo-600/15 border-indigo-500 text-white'
+          : 'bg-bg-950/70 hover:bg-bg-800 border-slate-800/80 text-slate-300';
+
+        const badge = rel.prerelease
+          ? `<span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">Pre-release</span>`
+          : `<span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Stable</span>`;
+
+        let statusDot = `<span class="w-2 h-2 rounded-full bg-emerald-400" title="Archiviata"></span>`;
+        if (rel.status === 'downloading' || rel.status === 'pending') {
+          statusDot = `<span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping" title="In download"></span>`;
+        } else if (rel.status === 'partial' || rel.status === 'error') {
+          statusDot = `<span class="w-2 h-2 rounded-full bg-amber-400" title="Parziale/Errore"></span>`;
+        }
+
+        return `
+          <div onclick="selectRelease('${escapeHtml(String(rel.id))}')"
+            class="p-3 rounded-xl border cursor-pointer transition ${activeCls}">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                ${statusDot}
+                <span class="font-mono font-semibold text-xs truncate">${escapeHtml(rel.tag_name)}</span>
+              </div>
+              ${badge}
+            </div>
+            <div class="text-xs text-slate-400 truncate mt-1">${escapeHtml(rel.name || rel.tag_name)}</div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 mt-2">
+              <span>${formatDate(rel.published_at)}</span>
+              <span class="font-mono">${rel.assets ? rel.assets.length : 0} file · ${formatBytes(rel.total_size)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectRelease(releaseId) {
+      selectedReleaseId = releaseId;
+      renderRepoVersionsList();
+      renderSelectedReleaseInspector();
+    }
+
+    function toggleMarkdownMode() {
+      showRawMarkdown = !showRawMarkdown;
+      renderSelectedReleaseInspector();
+    }
+
+    function copyText(txt, label = 'Copiato negli appunti') {
+      navigator.clipboard.writeText(txt);
+      showToast(label, 'success');
+    }
+
+    function renderSelectedReleaseInspector() {
+      const box = document.getElementById('detail-release-inspector');
+      if (!currentRepoDetail || !selectedReleaseId) {
+        box.innerHTML = `<div class="text-center text-slate-500 py-16 text-sm">Nessuna release selezionata o sincronizzazione in corso...</div>`;
+        return;
+      }
+      const rel = currentRepoDetail.releases.find(r => String(r.id) === String(selectedReleaseId));
+      if (!rel) return;
+
+      const isDetached = !!currentRepoDetail.is_detached;
+      const folderName = currentRepoDetail.repository.folder_name || '';
+
+      const channelBadge = rel.prerelease
+        ? `<span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">Pre-Release / Beta</span>`
+        : `<span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Release Ufficiale (Stable)</span>`;
+
+      const assetsHtml = (rel.assets || []).map(a => {
+        const isReady = a.status === 'completed';
+        const typeLabel = a.asset_type === 'source_zip' || a.asset_type === 'source_tar'
+          ? `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">SOURCE</span>`
+          : `<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300">ASSET</span>`;
+
+        const downloadHref = isDetached
+          ? `/api/detached-archives/download?path=${encodeURIComponent(a.rel_path)}`
+          : `/api/assets/${a.id}/download`;
+
+        return `
+          <div class="p-3 rounded-xl bg-bg-950 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                ${typeLabel}
+                <span class="font-mono text-xs text-white font-medium truncate">${escapeHtml(a.name)}</span>
+                <span class="text-xs text-slate-500 font-mono">(${formatBytes(a.size)})</span>
+              </div>
+              ${a.sha256 ? `
+                <div class="flex items-center gap-1.5 mt-1 text-[11px] text-slate-500 font-mono">
+                  <span>SHA256: ${a.sha256.slice(0, 16)}...${a.sha256.slice(-8)}</span>
+                  <button onclick="copyText('${a.sha256}', 'SHA256!')" class="text-indigo-400 hover:underline">[Copy]</button>
+                </div>
+              ` : `<div class="text-[11px] text-amber-400/80 mt-1">${escapeHtml(a.status)}</div>`}
+            </div>
+            <div class="shrink-0">
+              ${isReady ? `
+                <a href="${downloadHref}"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                  </svg>
+                  <span>${tr('btnDownload')}</span>
+                </a>
+              ` : `
+                <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-slate-800 text-slate-400">${tr('inQueue')}...</span>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const bundleHref = isDetached
+        ? `/api/detached-archives/bundle?folder=${encodeURIComponent(folderName)}&version=${encodeURIComponent(rel.version_folder || rel.id)}`
+        : `/api/releases/${rel.id}/bundle`;
+
+      box.innerHTML = `
+        <!-- Release Header -->
+        <div class="border-b border-slate-800 pb-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-mono text-lg font-bold text-indigo-400">${escapeHtml(rel.tag_name)}</span>
+              ${channelBadge}
+            </div>
+            <h3 class="text-base font-semibold text-white mt-1">${escapeHtml(rel.name || rel.tag_name)}</h3>
+            <div class="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-3">
+              <span><strong>${formatDate(rel.published_at)}</strong></span>
+              <span>·</span>
+              <span class="font-mono text-[11px] text-slate-500">${escapeHtml(rel.folder_path)}</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <a href="${bundleHref}"
+              class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-medium text-white transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              <span>${tr('btnBundleZip')}</span>
+            </a>
+            ${!isDetached ? `
+              <button onclick="retryRelease(${rel.id})"
+                class="p-2 rounded-xl bg-bg-950 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs">
+                ↻
+              </button>
+              <button onclick="deleteRelease(${rel.id})"
+                class="p-2 rounded-xl bg-bg-950 hover:bg-rose-500/20 border border-slate-800 text-rose-400 text-xs">
+                🗑
+              </button>
+            ` : `
+              <button onclick="deleteDetachedVersion('${escapeHtml(folderName)}', '${escapeHtml(String(rel.version_folder || rel.id))}')"
+                class="p-2 rounded-xl bg-bg-950 hover:bg-rose-500/20 border border-slate-800 text-rose-400 text-xs">
+                🗑
+              </button>
+            `}
+          </div>
+        </div>
+
+        <!-- Downloadable Files Section -->
+        <div class="mb-6">
+          <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
+            ${tr('lblArchivedFiles')} (${rel.assets ? rel.assets.length : 0} - ${formatBytes(rel.total_size)})
+          </div>
+          <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
+            ${assetsHtml || `<div class="text-xs text-slate-500">--</div>`}
+          </div>
+        </div>
+
+        <!-- Patch Notes (Markdown) Section -->
+        <div class="flex-1 flex flex-col border-t border-slate-800 pt-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">${tr('lblPatchNotes')}</span>
+            <button onclick="toggleMarkdownMode()" class="text-xs text-indigo-400 hover:underline font-mono">
+              ${showRawMarkdown ? 'Markdown' : 'Raw'}
+            </button>
+          </div>
+          <div class="bg-bg-950 border border-slate-800/90 rounded-2xl p-4 sm:p-5 overflow-x-auto">
+            ${showRawMarkdown
+              ? `<pre class="text-xs font-mono text-slate-300 whitespace-pre-wrap">${escapeHtml(rel.body || '')}</pre>`
+              : `<div class="markdown-body">${renderMarkdown(rel.body)}</div>`
+            }
+          </div>
+        </div>
+      `;
+    }
+
+    // --- GLOBAL FEED ---
+    function debounceLoadFeed() {
+      clearTimeout(feedDebounceTimer);
+      feedDebounceTimer = setTimeout(loadGlobalFeed, 250);
+    }
+
+    async function loadGlobalFeed() {
+      const q = document.getElementById('feed-search-input').value || '';
+      const prerelease = document.getElementById('feed-channel-select').value || '';
+      const items = await apiFetch(`/api/feed?q=${encodeURIComponent(q)}&prerelease=${encodeURIComponent(prerelease)}`);
+
+      const box = document.getElementById('feed-list');
+      if (items.length === 0) {
+        box.innerHTML = `<div class="text-center text-slate-500 py-12 text-sm bg-bg-900 border border-slate-800/80 rounded-2xl">Nessuna release trovata nello storico globale.</div>`;
+        return;
+      }
+
+      box.innerHTML = items.map(rel => {
+        const badge = rel.prerelease
+          ? `<span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">Pre-Release</span>`
+          : `<span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Stable</span>`;
+
+        return `
+          <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-5 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+              <div class="flex items-center gap-3">
+                <img src="${escapeHtml(rel.repo_avatar || 'https://github.com/identicons/github.png')}" class="w-8 h-8 rounded-lg border border-slate-700" />
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span onclick="switchTab('repos'); openRepoDetail(${rel.repo_id})" class="font-semibold text-white hover:text-indigo-400 cursor-pointer text-sm">${escapeHtml(rel.repo_full_name)}</span>
+                    <span class="font-mono text-sm font-bold text-indigo-400">${escapeHtml(rel.tag_name)}</span>
+                    ${badge}
+                  </div>
+                  <div class="text-xs text-slate-500">${formatDate(rel.published_at)} · ${formatBytes(rel.total_size)}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <a href="/api/releases/${rel.id}/bundle" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition">
+                  Scarica ZIP (${rel.assets ? rel.assets.length : 0} file)
+                </a>
+                <button onclick="switchTab('repos'); openRepoDetail(${rel.repo_id}); setTimeout(() => selectRelease(${rel.id}), 250);"
+                  class="px-3 py-1.5 rounded-xl bg-bg-950 hover:bg-slate-800 border border-slate-800 text-xs text-slate-300">
+                  Apri Dettagli
+                </button>
+              </div>
+            </div>
+            <div class="markdown-body text-xs max-h-60 overflow-y-auto px-1">
+              ${renderMarkdown(rel.body)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- ADD / EDIT / DELETE REPOSITORY ACTIONS ---
+    let inspectDebounceTimer = null;
+
+    function getAllKnownCategories() {
+      const fromRepos = reposList.map(r => r.category).filter(Boolean);
+      const defaults = ['Giochi', 'Emulatore', 'MOD VR'];
+      return Array.from(new Set([...fromRepos, ...defaults]));
+    }
+
+    function populateCategoryQuickPicks(containerId, inputId) {
+      const cats = getAllKnownCategories();
+      const datalist = document.getElementById('existing-categories-datalist');
+      if (datalist) {
+        datalist.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}"></option>`).join('');
+      }
+      const box = document.getElementById(containerId);
+      if (!box) return;
+      const curVal = (document.getElementById(inputId).value || '').trim();
+      box.innerHTML = cats.map(c => {
+        const isActive = curVal.toLowerCase() === c.toLowerCase();
+        const cls = isActive
+          ? 'bg-indigo-600 text-white border-indigo-500'
+          : 'bg-bg-950 hover:bg-slate-800 text-slate-300 border-slate-700';
+        return `<button type="button" onclick="pickModalCategory('${inputId}', '${containerId}', '${escapeHtml(c)}')"
+          class="px-2.5 py-1 rounded-lg text-xs font-medium border transition ${cls}">
+          📁 ${escapeHtml(c)}
+        </button>`;
+      }).join('');
+    }
+
+    function pickModalCategory(inputId, containerId, cat) {
+      document.getElementById(inputId).value = cat;
+      populateCategoryQuickPicks(containerId, inputId);
+    }
+
+    function onAddRepoInputChanged() {
+      clearTimeout(inspectDebounceTimer);
+      const raw = document.getElementById('add-repo-input').value.trim();
+      const hint = document.getElementById('add-repo-auto-hint');
+      if (!raw || (!raw.includes('/') && !raw.includes('github.com') && !raw.includes('nexusmods.com'))) {
+        hint.innerHTML = `Incolla un link GitHub o Nexus Mods: <strong>Categoria e Tag vengono generati in automatico</strong>.`;
+        return;
+      }
+      hint.innerHTML = `<span class="text-indigo-400 animate-pulse">🔍 Analisi link per auto-generare Categoria e Tag...</span>`;
+      inspectDebounceTimer = setTimeout(async () => {
+        try {
+          const info = await apiFetch(`/api/github/inspect?repo=${encodeURIComponent(raw)}`);
+          document.getElementById('add-repo-category').value = info.suggested_category || 'Giochi';
+          document.getElementById('add-repo-tags').value = info.suggested_tags || '';
+          populateCategoryQuickPicks('add-category-quick-picks', 'add-repo-category');
+          const srcLabel = info.provider === 'nexusmods' ? 'NEXUS MODS' : 'GITHUB';
+          hint.innerHTML = `<span class="text-emerald-400">✨ [${srcLabel}] Auto-rilevato: <strong>${escapeHtml(info.full_name)}</strong> → Categoria: <code>${escapeHtml(info.suggested_category)}</code> | Tag: <code>${escapeHtml(info.suggested_tags)}</code></span>`;
+        } catch {
+          hint.innerHTML = `<span class="text-slate-400">Tag e categoria verranno generati automaticamente al salvataggio.</span>`;
+        }
+      }, 350);
+    }
+
+    function onOnlyLatestToggled() {
+      const onlyLatest = document.getElementById('add-repo-only-latest').checked;
+      const btn = document.getElementById('btn-submit-add-repo');
+      if (btn && !btn.disabled) {
+        btn.textContent = onlyLatest ? 'Aggiungi (Solo Ultima + Future)' : 'Aggiungi e Scarica Storico';
+      }
+    }
+
+    function openAddRepoModal() {
+      document.getElementById('modal-add-repo').classList.remove('hidden');
+      document.getElementById('form-add-repo').reset();
+      document.getElementById('add-repo-category').value = '';
+      document.getElementById('add-repo-tags').value = '';
+      document.getElementById('add-repo-only-latest').checked = false;
+      onOnlyLatestToggled();
+      document.getElementById('add-repo-auto-hint').innerHTML =
+        `Incolla il link: <strong>Categoria e Tag vengono generati in automatico</strong> dal link GitHub o Nexus Mods.`;
+      populateCategoryQuickPicks('add-category-quick-picks', 'add-repo-category');
+      document.getElementById('add-repo-input').focus();
+    }
+
+    function closeAddRepoModal() {
+      document.getElementById('modal-add-repo').classList.add('hidden');
+      document.getElementById('form-add-repo').reset();
+    }
+
+    document.getElementById('form-add-repo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-add-repo');
+      btn.disabled = true;
+      btn.textContent = 'Verifica e Auto-Tag...';
+
+      try {
+        const onlyLatest = document.getElementById('add-repo-only-latest').checked;
+        const payload = {
+          repo_input: document.getElementById('add-repo-input').value.trim(),
+          category: document.getElementById('add-repo-category').value.trim(),
+          tags: document.getElementById('add-repo-tags').value.trim(),
+          asset_filter: document.getElementById('add-repo-filter').value.trim(),
+          include_prereleases: document.getElementById('add-repo-prerelease').checked,
+          download_source: document.getElementById('add-repo-source').checked,
+          only_latest: onlyLatest,
+        };
+        const res = await apiFetch('/api/repos', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        closeAddRepoModal();
+        const modeMsg = onlyLatest ? 'Download ultima release avviato.' : 'Download storico avviato.';
+        showToast(`Repository ${res.full_name} aggiunto in "${res.category}"! ${modeMsg}`, 'success');
+        await refreshAll();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        onOnlyLatestToggled();
+      }
+    });
+
+    function openEditRepoModal() {
+      if (!currentRepoDetail) return;
+      const r = currentRepoDetail.repository;
+      document.getElementById('edit-repo-category').value = r.category || 'Generale';
+      document.getElementById('edit-repo-tags').value = r.tags || '';
+      document.getElementById('edit-repo-filter').value = r.asset_filter || '';
+      document.getElementById('edit-repo-prerelease').checked = !!r.include_prereleases;
+      document.getElementById('edit-repo-source').checked = !!r.download_source;
+      document.getElementById('edit-repo-only-latest').checked = !!r.only_latest;
+      populateCategoryQuickPicks('edit-category-quick-picks', 'edit-repo-category');
+      document.getElementById('modal-edit-repo').classList.remove('hidden');
+    }
+
+    function closeEditRepoModal() {
+      document.getElementById('modal-edit-repo').classList.add('hidden');
+    }
+
+    document.getElementById('form-edit-repo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentRepoDetail) return;
+      try {
+        await apiFetch(`/api/repos/${currentRepoDetail.repository.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            category: document.getElementById('edit-repo-category').value.trim(),
+            tags: document.getElementById('edit-repo-tags').value.trim(),
+            asset_filter: document.getElementById('edit-repo-filter').value.trim(),
+            include_prereleases: document.getElementById('edit-repo-prerelease').checked,
+            download_source: document.getElementById('edit-repo-source').checked,
+            only_latest: document.getElementById('edit-repo-only-latest').checked,
+          })
+        });
+        closeEditRepoModal();
+        showToast('Impostazioni repository salvate.', 'success');
+        await openRepoDetail(currentRepoDetail.repository.id, true);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    async function toggleGlobalPause() {
+      try {
+        const res = await apiFetch('/api/pause-global', {
+          method: 'POST',
+          body: JSON.stringify({})
+        });
+        updateGlobalPauseUI(res.global_paused);
+        if (res.global_paused) {
+          showToast('⏸ Sincronizzazione e download globali messi in PAUSA.', 'info');
+        } else {
+          showToast('▶️ Sincronizzazione e download globali RIPRESI!', 'success');
+        }
+        await refreshAll();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function toggleRepoPause(repoId, event) {
+      if (event) event.stopPropagation();
+      try {
+        const res = await apiFetch(`/api/repos/${repoId}/pause`, {
+          method: 'POST',
+          body: JSON.stringify({})
+        });
+        if (res.paused) {
+          showToast(`⏸ Repository ${res.full_name} messa in pausa.`, 'info');
+        } else {
+          showToast(`▶️ Repository ${res.full_name} ripresa!`, 'success');
+        }
+        await refreshAll();
+        if (currentRepoDetail && currentRepoDetail.repository.id === repoId) {
+          await openRepoDetail(repoId, true);
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function toggleCurrentRepoPause() {
+      if (!currentRepoDetail) return;
+      await toggleRepoPause(currentRepoDetail.repository.id);
+    }
+
+    async function syncCurrentRepo() {
+      if (!currentRepoDetail) return;
+      try {
+        await apiFetch(`/api/repos/${currentRepoDetail.repository.id}/sync`, { method: 'POST' });
+        showToast('Controllo nuove release avviato in background.', 'info');
+        setTimeout(() => openRepoDetail(currentRepoDetail.repository.id, true), 1500);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function triggerSyncAll() {
+      try {
+        await apiFetch('/api/sync-all', { method: 'POST' });
+        showToast('Controllo globale di tutti i repository avviato!', 'info');
+        setTimeout(refreshAll, 1500);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function openPurgeDataModal() {
+      if (!currentRepoDetail || currentRepoDetail.is_detached) return;
+      document.getElementById('purge-repo-name').textContent = currentRepoDetail.repository.full_name;
+      document.getElementById('modal-purge-data').classList.remove('hidden');
+    }
+
+    function closePurgeDataModal() {
+      document.getElementById('modal-purge-data').classList.add('hidden');
+    }
+
+    async function confirmPurgeRepoData(resync) {
+      if (!currentRepoDetail || currentRepoDetail.is_detached) return;
+      const repoId = currentRepoDetail.repository.id;
+      const name = currentRepoDetail.repository.full_name;
+      closePurgeDataModal();
+      try {
+        await apiFetch(`/api/repos/${repoId}/purge-data?resync=${resync ? 'true' : 'false'}`, { method: 'POST' });
+        if (resync) {
+          showToast(`🧹 Dati di ${name} eliminati! Riavvio download con le opzioni attuali...`, 'success');
+        } else {
+          showToast(`🧹 Tutti i dati di ${name} eliminati (repository messa in pausa).`, 'info');
+        }
+        selectedReleaseId = null;
+        await openRepoDetail(repoId);
+        await refreshOverview();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function openDeleteRepoModal() {
+      if (!currentRepoDetail) return;
+      if (currentRepoDetail.is_detached) {
+        const folderName = currentRepoDetail.repository.folder_name;
+        const name = currentRepoDetail.repository.full_name;
+        if (!confirm(`Vuoi eliminare definitivamente dal disco tutti i file conservati di "${name}"?`)) return;
+        try {
+          await apiFetch(`/api/detached-archives/${encodeURIComponent(folderName)}`, { method: 'DELETE' });
+          showToast(`Archivio locale "${name}" eliminato definitivamente dal disco.`, 'info');
+          closeRepoDetail();
+          await refreshOverview();
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+        return;
+      }
+      document.getElementById('delete-repo-name').textContent = currentRepoDetail.repository.full_name;
+      document.getElementById('modal-delete-repo').classList.remove('hidden');
+    }
+
+    function closeDeleteRepoModal() {
+      document.getElementById('modal-delete-repo').classList.add('hidden');
+    }
+
+    async function confirmDeleteRepo(deleteFiles) {
+      if (!currentRepoDetail || currentRepoDetail.is_detached) return;
+      const repoId = currentRepoDetail.repository.id;
+      const name = currentRepoDetail.repository.full_name;
+      closeDeleteRepoModal();
+      try {
+        await apiFetch(`/api/repos/${repoId}?delete_files=${deleteFiles ? 'true' : 'false'}`, { method: 'DELETE' });
+        if (deleteFiles) {
+          showToast(`🗑 Repository ${name} e relativi file eliminati definitivamente.`, 'info');
+        } else {
+          showToast(`📦 Repository ${name} rimossa! I file restano accessibili in "🗄 Archivi Conservati".`, 'success');
+        }
+        closeRepoDetail();
+        await refreshOverview();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function deleteDetachedVersion(folderName, versionName) {
+      if (!confirm(`Eliminare dal disco la versione "${versionName}"?`)) return;
+      try {
+        await apiFetch(`/api/detached-archives/${encodeURIComponent(folderName)}?version=${encodeURIComponent(versionName)}`, { method: 'DELETE' });
+        showToast(`Versione ${versionName} eliminata dal disco.`, 'info');
+        try {
+          await openDetachedArchiveDetail(folderName);
+        } catch {
+          closeRepoDetail();
+        }
+        await refreshOverview();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function retryRelease(releaseId) {
+      await apiFetch(`/api/releases/${releaseId}/retry`, { method: 'POST' });
+      showToast('Release rimessa in coda di download.', 'info');
+    }
+
+    async function deleteRelease(releaseId) {
+      if (!confirm('Eliminare questa singola versione e i suoi file dal disco?')) return;
+      await apiFetch(`/api/releases/${releaseId}`, { method: 'DELETE' });
+      showToast('Versione eliminata.', 'info');
+      if (currentRepoDetail) {
+        selectedReleaseId = null;
+        await openRepoDetail(currentRepoDetail.repository.id);
+      }
+    }
+
+    // --- SETTINGS ---
+    async function loadSettings() {
+      const s = await apiFetch('/api/settings');
+      document.getElementById('set-gh-token').value = s.has_github_token ? '__KEEP__' : '';
+      document.getElementById('set-gh-token-status').textContent = s.has_github_token
+        ? `Token attivo (${s.github_token_masked}). Lascia invariato o inserisci un nuovo token.`
+        : 'Nessun token configurato (limite GitHub standard: 60 richieste/ora).';
+
+      document.getElementById('set-check-interval').value = s.check_interval_minutes || '60';
+      document.getElementById('set-nexus-user').value = s.nexus_username || '';
+      document.getElementById('set-nexus-apikey').value = s.has_nexus_api_key ? '__KEEP__' : '';
+      document.getElementById('set-nexus-session').value = s.has_nexus_session ? '__KEEP__' : '';
+      document.getElementById('nexus-status-badge').textContent =
+        (s.has_nexus_api_key && s.has_nexus_session)
+          ? `NEXUS MODS: Connesso${s.nexus_username ? ' (' + s.nexus_username + ')' : ''}`
+          : `NEXUS MODS: Non Configurato / Parziale`;
+
+      document.getElementById('set-discord-webhook').value = s.discord_webhook_url || '';
+      document.getElementById('set-tg-token').value = s.telegram_bot_token || '';
+      document.getElementById('set-tg-chat').value = s.telegram_chat_id || '';
+      document.getElementById('set-smtp-host').value = s.smtp_host || '';
+      document.getElementById('set-smtp-port').value = s.smtp_port || '587';
+      document.getElementById('set-smtp-user').value = s.smtp_user || '';
+      document.getElementById('set-smtp-pass').value = s.has_smtp_password ? '__KEEP__' : '';
+      document.getElementById('set-smtp-from').value = s.smtp_from || '';
+      document.getElementById('set-smtp-to').value = s.smtp_to || '';
+      document.getElementById('set-new-username').value = s.auth_username || 'admin';
+      document.getElementById('set-new-password').value = '';
+
+      if (s.rate_limit && s.rate_limit.remaining !== null) {
+        document.getElementById('rate-limit-badge').textContent =
+          `GitHub API: ${s.rate_limit.remaining} / ${s.rate_limit.limit} richieste disponibili`;
+      }
+    }
+
+    async function saveSettings() {
+      try {
+        await apiFetch('/api/settings', {
+          method: 'PUT',
+          body: JSON.stringify({
+            github_token: document.getElementById('set-gh-token').value,
+            check_interval_minutes: document.getElementById('set-check-interval').value,
+            nexus_username: document.getElementById('set-nexus-user').value,
+            nexus_api_key: document.getElementById('set-nexus-apikey').value,
+            nexus_session_cookie: document.getElementById('set-nexus-session').value,
+            discord_webhook_url: document.getElementById('set-discord-webhook').value,
+            telegram_bot_token: document.getElementById('set-tg-token').value,
+            telegram_chat_id: document.getElementById('set-tg-chat').value,
+            smtp_host: document.getElementById('set-smtp-host').value,
+            smtp_port: document.getElementById('set-smtp-port').value,
+            smtp_user: document.getElementById('set-smtp-user').value,
+            smtp_password: document.getElementById('set-smtp-pass').value,
+            smtp_from: document.getElementById('set-smtp-from').value,
+            smtp_to: document.getElementById('set-smtp-to').value,
+            new_username: document.getElementById('set-new-username').value,
+            new_password: document.getElementById('set-new-password').value,
+          })
+        });
+        showToast('Impostazioni salvate con successo!', 'success');
+        await loadSettings();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function sendTestNotification() {
+      try {
+        await saveSettings();
+        await apiFetch('/api/settings/test-notification', { method: 'POST' });
+        showToast('Notifica di test inviata ai canali configurati!', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // --- 10-LANGUAGE I18N & INTERACTIVE SETUP WIZARD ---
+    let currentLang = localStorage.getItem('vault_lang') || 'it';
+    let currentWizardStep = 1;
+
+    const I18N = {
+      it: {
+        loginSub: 'Archivio Storico Privato & Patch Notes', lblUsername: 'Nome Utente', lblPassword: 'Password', btnLogin: 'Accedi al Vault',
+        badgePrivate: 'PRIVATO', tabRepos: 'Repository', tabFeed: 'Storico & Patch Notes', tabActivity: 'Coda & Log', tabSettings: 'Impostazioni',
+        btnDonate: 'Supporta / Dona', btnGuide: 'Guida & Wizard', pauseAll: 'Pausa Tutto', resumeAll: 'Riprendi Tutto',
+        btnCheckNow: 'Controlla Ora', btnAddSource: 'Aggiungi GitHub / Nexus',
+        bannerGlobalPaused: 'Sincronizzazione e download globali in PAUSA — Nessun file viene scaricato al momento.',
+        btnResumeNow: '▶️ Riprendi Tutto Ora',
+        statMonitoredRepos: 'Repository Monitorati', statAutoCheck: 'Controllo automatico attivo',
+        statArchivedReleases: 'Release Archiviate', statArchiveSize: 'Dimensione Archivio',
+        statShaNotes: 'Con SHA256 & Patch Notes', statDiskSpace: 'Spazio Disco Server',
+        filesDownloaded: 'file scaricati', freeSpace: 'liberi', usedSpace: 'Usati', lastCheck: 'Ultimo check',
+        inQueue: 'in coda', noActiveDl: 'Nessun download attivo in questo istante.',
+        phSearchRepo: 'Cerca per nome repository, descrizione, tag o versione...',
+        allFilter: 'Tutte', detachedPill: 'Archivi Conservati',
+        detachedTitle: '🗄 Archivi Conservati sul Disco (Senza Repository Attiva)',
+        detachedSub: 'File e Patch Notes mantenuti sul server dopo l\'eliminazione della repository',
+        badgeDetached: '🗄 ARCHIVIO CONSERVATO (SENZA REPO)',
+        btnPauseRepo: 'Pausa Repo', btnResumeRepo: 'Riprendi Repo', btnCheckReleases: 'Controlla Release',
+        btnEditOptions: 'Modifica Opzioni', btnPurgeData: 'Elimina Dati', btnDeleteRepo: 'Elimina Repo',
+        lblVersionHistory: 'Storico Versioni', optAllChannels: 'Tutte (Stable + Beta)', optStableOnly: 'Solo Stable', optPrereleaseOnly: 'Solo Pre-release',
+        phFilterVersions: 'Filtra versione o testo nelle patch notes...',
+        msgSelectVersion: 'Seleziona una versione a sinistra per visualizzare file e patch notes.',
+        phSearchFeed: 'Cerca in tutto lo storico (nome repo, versione, o parole dentro le Patch Notes)...',
+        hdrActiveDownloads: 'Download Attivi in Tempo Reale', hdrActivityLog: 'Registro Storico Attività', btnRefresh: 'Aggiorna',
+        lblVersions: 'Versioni', lblSpace: 'Spazio', stReady: 'Pronto', stPaused: 'In Pausa', stSyncing: 'Sincronizzazione...', stError: 'Errore', stPartial: 'Parziale',
+        btnPauseShort: 'Pausa', btnResumeShort: 'Riprendi',
+        noReposTitle: 'Nessun repository attivo presente', noReposSub: 'Clicca su "Aggiungi GitHub / Nexus" in alto a destra per scaricare e catalogare release e patch notes.',
+        btnDownload: 'Scarica', btnBundleZip: 'Bundle ZIP Completo', lblArchivedFiles: 'File Archiviati', lblPatchNotes: 'Patch Notes / Cosa è Cambiato',
+        setGhTitle: 'GitHub API & Sincronizzazione Automatica', setGhSub: 'Inserisci un Personal Access Token per portare il limite da 60 a 5.000 richieste/ora e accedere ai tuoi repo privati.',
+        lblGhToken: 'GitHub Personal Access Token (opzionale)', lblCheckInterval: 'Intervallo Controllo (minuti)', lblCheckDefault: 'Default: 60 minuti.',
+        setNexusTitle: 'Integrazione Nexus Mods', setNexusSub: 'Scarica automaticamente mod, vecchie versioni e changelogs da Nexus Mods.',
+        lblNexusUser: 'Utente Nexus Mods', setNotifTitle: 'Sistema di Notifiche', setNotifSub: 'Ricevi un avviso automatico appena esce una nuova release.',
+        btnTestNotif: 'Invia Notifica di Test', lblSmtp: 'Notifiche Email (SMTP)',
+        setCredsTitle: 'Credenziali di Accesso', setCredsSub: 'Modifica l\'utenza di accesso al portale.',
+        lblNewUsername: 'Nuovo Username', lblNewPassword: 'Nuova Password (lascia vuoto per non cambiare)', btnSaveSettings: 'Salva Tutte le Impostazioni',
+        modalAddTitle: 'Aggiungi da GitHub o Nexus Mods', lblSourceLink: 'Link GitHub oppure Nexus Mods *',
+        hintAutoTag: 'Incolla un link GitHub o Nexus Mods: Categoria e Tag vengono generati in automatico.',
+        lblCategory: 'Categoria (clicca una esistente o scrivi nuova)', lblTags: 'Tag (generati in automatico)', lblAssetFilter: 'Filtro File Opzionale (Regex)',
+        chkOnlyLatestTitle: '⚡ Scarica solo l\'ULTIMA release e le successive future',
+        chkOnlyLatestSub: 'Ignora tutte le vecchie versioni passate: scarica subito solo l\'ultima build disponibile e le future.',
+        chkIncludePrerelease: 'Includi sia Stable che Pre-release / Beta', chkDownloadSource: 'Archivia anche il Codice Sorgente (.zip e .tar.gz)',
+        btnCancel: 'Annulla', btnAddHistory: 'Aggiungi e Scarica', modalEditTitle: 'Opzioni Repository', btnSaveChanges: 'Salva Modifiche',
+        modalPurgeTitle: 'Pulisci / Elimina Dati Repository', modalPurgeDesc1: 'Stai per eliminare tutte le versioni e i file scaricati finora per',
+        modalPurgeDesc2: 'La repository resterà salvata con le tue opzioni attuali. Come vuoi procedere?',
+        btnPurgeAndResync: '🧹 Elimina tutti i dati e Riscarica Subito (con le opzioni attuali)',
+        btnPurgeOnly: '⏸ Solo Elimina tutti i dati (lascia la repository vuota in Pausa)',
+        modalDeleteDesc1: 'Stai per rimuovere', modalDeleteDesc2: 'Vuoi conservare sul disco i file già scaricati (accessibili in "🗄 Archivi Conservati"), oppure eliminare tutto?',
+        btnDeleteKeepFiles: '📦 Elimina Repository ma CONSERVA i Dati Scaricati', btnDeleteKeepSub: 'Mantiene tutti i file e le patch notes accessibili nell\'Archivio Locale.',
+        btnDeleteWipeFiles: '🗑 Elimina Repository + Elimina TUTTI i File dal Disco', btnDeleteWipeSub: 'Cancella definitivamente sia la repository che tutti i file sul server.',
+        wizTitle: 'Procedura Guidata & Manuale Completo — Release Vault',
+        wizSub: 'Configurazione passo-passo di Utente, GitHub API, Nexus Mods, Bot Telegram 24/7 e Comandi',
+        wizTab1: '1. 👤 Account', wizTab2: '2. 🐙 GitHub API', wizTab3: '3. 🎮 Nexus Mods', wizTab4: '4. 🤖 Telegram Bot', wizTab5: '5. 📖 Manuale',
+        s1Title: 'Benvenuto in Release Vault!',
+        s1Desc: 'Questa piattaforma privata monitora i tuoi progetti GitHub e le tue mod di Nexus Mods, scaricando e catalogando automaticamente ogni versione con file binari, codice sorgente, checksum SHA256 e Patch Notes in Markdown.',
+        s1Hdr: '🔐 1. Imposta le Credenziali di Accesso Amministratore', s1Sub: 'Scegli il nome utente e la password con cui proteggere l\'accesso alla tua interfaccia web privata.',
+        s2Hdr: '🐙 2. Come configurare GitHub Personal Access Token (Consigliato)',
+        s2Desc: 'Senza token, GitHub limita le richieste API a 60 all\'ora. Con un token gratuito il limite sale a 5.000 richieste/ora.',
+        s2StepsTitle: '📋 Procedura passo-passo per ottenere il Token GitHub:',
+        s2Step2: 'Imposta Expiration su No expiration e spunta il permesso "repo".',
+        s2Step3: 'Clicca su Generate token e incolla qui sotto il codice ghp_...',
+        s3Hdr: '🎮 3. Come configurare Nexus Mods (API Key + Session Cookie)',
+        s3Desc: 'Per scaricare automaticamente i file delle mod e i changelog da Nexus Mods (anche con account Free!), servono 2 parametri:',
+        s3KeyStep: 'Scorri fino in fondo alla sezione Personal API Key, copia la chiave e incollala qui sotto.',
+        s3CookieStep: 'Application / Archiviazione → Cookies → copia il valore di nexusmods_session.',
+        s4Hdr: '🤖 4. Come creare e blindare il tuo Bot Telegram Personale 24/7',
+        s4Desc: 'Il Bot Telegram 24/7 risponde esclusivamente al tuo Telegram User ID, invia notifiche con le Patch Notes e permette di aggiungere link dalla chat!',
+        s4BotStep: 'Copia il Token HTTP API (es. 123456:AAH...) e incollalo qui sotto.',
+        s4IdStep: 'Copia il tuo numero Id: il bot risponderà solo ed esclusivamente a te!',
+        s5Hdr: '📖 5. Guida Completa ai Comandi e alle Funzionalità',
+        s5Card1Title: '✨ Auto-Tag & Memoria Categorie', s5Card1Desc: 'Incollando un link GitHub o Nexus Mods, il sistema genera in automatico Categoria e Tag.',
+        s5Card2Title: '⚡ Solo Ultima + Future vs 📚 Storico', s5Card2Desc: 'Scegli per ogni repo se scaricare tutto lo storico passato oppure solo l\'ULTIMA release e le successive.',
+        s5Card3Title: '⏸ Pausa Globale e Pausa Singola Repo', s5Card3Desc: 'Metti in pausa tutti i download o una singola repository.',
+        s5Card4Title: '🧹 Elimina Dati & 🗄 Archivi Conservati', s5Card4Desc: 'Svuota i dati di una repo o conserva i file sul disco anche dopo l\'eliminazione della repo!',
+        s5BotTitle: '🤖 Comandi del Bot Telegram (/menu, /status, /sync):',
+        s5BotDesc: 'Usa /menu per la Dashboard interattiva, /status per lo stato dei download, /sync per controllare aggiornamenti, o incolla qualsiasi link in chat!',
+        donateBannerTitle: '☕ Ti piace Release Vault? Supporta il progetto!',
+        donateBannerDesc: 'Se questo progetto ti è utile, puoi supportare lo sviluppo con una donazione su PayPal.',
+        prev: '← Indietro', next: 'Avanti →', finish: '✅ Salva e Avvia Release Vault'
+      },
+      en: {
+        loginSub: 'Private Release Archiver & Patch Notes', lblUsername: 'Username', lblPassword: 'Password', btnLogin: 'Sign In to Vault',
+        badgePrivate: 'PRIVATE', tabRepos: 'Repositories', tabFeed: 'Release Feed & Notes', tabActivity: 'Queue & Logs', tabSettings: 'Settings',
+        btnDonate: 'Support / Donate', btnGuide: 'Guide & Wizard', pauseAll: 'Pause All', resumeAll: 'Resume All',
+        btnCheckNow: 'Check Now', btnAddSource: 'Add GitHub / Nexus',
+        bannerGlobalPaused: 'Global sync and downloads are PAUSED — No files are currently being downloaded.',
+        btnResumeNow: '▶️ Resume All Now',
+        statMonitoredRepos: 'Monitored Repositories', statAutoCheck: 'Automatic check active',
+        statArchivedReleases: 'Archived Releases', statArchiveSize: 'Total Archive Size',
+        statShaNotes: 'With SHA256 & Patch Notes', statDiskSpace: 'Server Disk Space',
+        filesDownloaded: 'files downloaded', freeSpace: 'free', usedSpace: 'Used', lastCheck: 'Last check',
+        inQueue: 'queued', noActiveDl: 'No active downloads right now.',
+        phSearchRepo: 'Search by repository name, description, tag or version...',
+        allFilter: 'All', detachedPill: 'Saved Archives',
+        detachedTitle: '🗄 Saved Disk Archives (Without Active Repository)',
+        detachedSub: 'Files and Patch Notes kept on disk after repository deletion',
+        badgeDetached: '🗄 SAVED ARCHIVE (DETACHED)',
+        btnPauseRepo: 'Pause Repo', btnResumeRepo: 'Resume Repo', btnCheckReleases: 'Check Releases',
+        btnEditOptions: 'Edit Options', btnPurgeData: 'Purge Data', btnDeleteRepo: 'Delete Repo',
+        lblVersionHistory: 'Version History', optAllChannels: 'All (Stable + Beta)', optStableOnly: 'Stable Only', optPrereleaseOnly: 'Pre-release Only',
+        phFilterVersions: 'Filter version or patch notes text...',
+        msgSelectVersion: 'Select a version on the left to view files and patch notes.',
+        phSearchFeed: 'Search global history (repo name, version, or words inside Patch Notes)...',
+        hdrActiveDownloads: 'Real-Time Active Downloads', hdrActivityLog: 'Activity Log History', btnRefresh: 'Refresh',
+        lblVersions: 'Versions', lblSpace: 'Size', stReady: 'Ready', stPaused: 'Paused', stSyncing: 'Syncing...', stError: 'Error', stPartial: 'Partial',
+        btnPauseShort: 'Pause', btnResumeShort: 'Resume',
+        noReposTitle: 'No active repositories yet', noReposSub: 'Click "Add GitHub / Nexus" in the top right to download and catalog releases and patch notes.',
+        btnDownload: 'Download', btnBundleZip: 'Full ZIP Bundle', lblArchivedFiles: 'Archived Files', lblPatchNotes: 'Patch Notes / Changelog',
+        setGhTitle: 'GitHub API & Automatic Sync', setGhSub: 'Add a Personal Access Token to raise the rate limit from 60 to 5,000 requests/hour and access private repos.',
+        lblGhToken: 'GitHub Personal Access Token (optional)', lblCheckInterval: 'Check Interval (minutes)', lblCheckDefault: 'Default: 60 minutes.',
+        setNexusTitle: 'Nexus Mods Integration', setNexusSub: 'Automatically download mods, older versions and changelogs from Nexus Mods.',
+        lblNexusUser: 'Nexus Mods Username', setNotifTitle: 'Notification System', setNotifSub: 'Receive automatic alerts when a new release is archived.',
+        btnTestNotif: 'Send Test Notification', lblSmtp: 'Email Notifications (SMTP)',
+        setCredsTitle: 'Login Credentials', setCredsSub: 'Update your administrator username and password.',
+        lblNewUsername: 'New Username', lblNewPassword: 'New Password (leave blank to keep current)', btnSaveSettings: 'Save All Settings',
+        modalAddTitle: 'Add from GitHub or Nexus Mods', lblSourceLink: 'GitHub or Nexus Mods Link *',
+        hintAutoTag: 'Paste a GitHub or Nexus Mods link: Category and Tags are generated automatically.',
+        lblCategory: 'Category (click an existing one or type a new one)', lblTags: 'Tags (auto-generated)', lblAssetFilter: 'Optional File Filter (Regex)',
+        chkOnlyLatestTitle: '⚡ Download ONLY the latest release and future updates',
+        chkOnlyLatestSub: 'Skip all older past releases: immediately download only the latest build and any future releases.',
+        chkIncludePrerelease: 'Include both Stable and Pre-release / Beta', chkDownloadSource: 'Also archive Source Code (.zip & .tar.gz)',
+        btnCancel: 'Cancel', btnAddHistory: 'Add & Download', modalEditTitle: 'Repository Options', btnSaveChanges: 'Save Changes',
+        modalPurgeTitle: 'Purge / Clean Repository Data', modalPurgeDesc1: 'You are about to delete all downloaded versions and files for',
+        modalPurgeDesc2: 'The repository will remain saved with your current options. How would you like to proceed?',
+        btnPurgeAndResync: '🧹 Purge all data & Re-download Now (with current options)',
+        btnPurgeOnly: '⏸ Purge all data only (leave repository empty & Paused)',
+        modalDeleteDesc1: 'You are about to remove', modalDeleteDesc2: 'Do you want to keep downloaded files on disk (accessible in "🗄 Saved Archives"), or wipe everything?',
+        btnDeleteKeepFiles: '📦 Delete Repository but KEEP Downloaded Files', btnDeleteKeepSub: 'Stops checking for updates, but keeps all files and patch notes in Local Archive.',
+        btnDeleteWipeFiles: '🗑 Delete Repository + WIPE All Files from Disk', btnDeleteWipeSub: 'Permanently deletes both the repository and all archived files on the server.',
+        wizTitle: 'Setup Wizard & Complete Manual — Release Vault',
+        wizSub: 'Step-by-step configuration for Admin User, GitHub API, Nexus Mods, 24/7 Telegram Bot & Commands',
+        wizTab1: '1. 👤 Account', wizTab2: '2. 🐙 GitHub API', wizTab3: '3. 🎮 Nexus Mods', wizTab4: '4. 🤖 Telegram Bot', wizTab5: '5. 📖 Manual',
+        s1Title: 'Welcome to Release Vault!',
+        s1Desc: 'This self-hosted platform monitors your GitHub projects and Nexus Mods, automatically downloading and cataloging every release with binaries, source code, SHA256 checksums, and Markdown Patch Notes.',
+        s1Hdr: '🔐 1. Set Up Administrator Login Credentials', s1Sub: 'Choose the username and password to protect access to your private web interface.',
+        s2Hdr: '🐙 2. How to Configure GitHub Personal Access Token (Recommended)',
+        s2Desc: 'Without a token, GitHub limits API requests to 60/hour. With a free token, the limit increases to 5,000 requests/hour.',
+        s2StepsTitle: '📋 Step-by-step guide to get your GitHub Token:',
+        s2Step2: 'Set Expiration to No expiration and check the "repo" scope.',
+        s2Step3: 'Click Generate token and paste the ghp_... code below:',
+        s3Hdr: '🎮 3. How to Configure Nexus Mods (API Key + Session Cookie)',
+        s3Desc: 'To automatically download mod files and changelogs from Nexus Mods (even with a Free account!), 2 parameters are required:',
+        s3KeyStep: 'Scroll to the bottom to Personal API Key, copy your key and paste it below.',
+        s3CookieStep: 'Application / Storage → Cookies → copy the value of nexusmods_session.',
+        s4Hdr: '🤖 4. How to Create & Lock Your Personal 24/7 Telegram Bot',
+        s4Desc: 'The 24/7 Telegram Bot responds exclusively to your numeric Telegram User ID, sends Patch Notes alerts, and lets you add links directly from chat!',
+        s4BotStep: 'Copy the HTTP API Token (e.g. 123456:AAH...) and paste it below.',
+        s4IdStep: 'Copy your numeric Id: the bot will respond exclusively to you!',
+        s5Hdr: '📖 5. Complete Guide to Commands & Features',
+        s5Card1Title: '✨ Auto-Tag & Category Memory', s5Card1Desc: 'Paste any GitHub or Nexus Mods link and the system automatically generates Category and Tags.',
+        s5Card2Title: '⚡ Latest Only + Future vs 📚 Full History', s5Card2Desc: 'Choose per repo whether to download full history or only the LATEST release and future ones.',
+        s5Card3Title: '⏸ Global Pause & Per-Repo Pause', s5Card3Desc: 'Pause all downloads at once or pause individual repositories.',
+        s5Card4Title: '🧹 Purge Data & 🗄 Saved Archives', s5Card4Desc: 'Purge repo data to restart clean, or keep files on disk even after deleting a repo!',
+        s5BotTitle: '🤖 Telegram Bot Commands (/menu, /status, /sync):',
+        s5BotDesc: 'Use /menu for the interactive dashboard, /status for live downloads & disk space, /sync to check updates, or paste any link in chat!',
+        donateBannerTitle: '☕ Enjoying Release Vault? Support the project!',
+        donateBannerDesc: 'If you find this project useful, you can support its development via PayPal.',
+        prev: '← Back', next: 'Next →', finish: '✅ Save & Launch Release Vault'
+      },
+      es: {
+        loginSub: 'Archivo Privado de Versiones y Notas', lblUsername: 'Usuario', lblPassword: 'Contraseña', btnLogin: 'Entrar al Vault',
+        badgePrivate: 'PRIVADO', tabRepos: 'Repositorios', tabFeed: 'Historial y Notas', tabActivity: 'Cola y Registros', tabSettings: 'Ajustes',
+        btnDonate: 'Apoyar / Donar', btnGuide: 'Guía y Asistente', pauseAll: 'Pausar Todo', resumeAll: 'Reanudar Todo',
+        btnCheckNow: 'Comprobar Ahora', btnAddSource: 'Añadir GitHub / Nexus',
+        bannerGlobalPaused: 'Sincronización y descargas globales en PAUSA.', btnResumeNow: '▶️ Reanudar Todo',
+        statMonitoredRepos: 'Repositorios Monitoreados', statAutoCheck: 'Control automático activo',
+        statArchivedReleases: 'Versiones Archivadas', statArchiveSize: 'Tamaño del Archivo',
+        statShaNotes: 'Con SHA256 y Notas', statDiskSpace: 'Espacio en Disco',
+        filesDownloaded: 'archivos descargados', freeSpace: 'libres', usedSpace: 'Usado', lastCheck: 'Último control',
+        inQueue: 'en cola', noActiveDl: 'No hay descargas activas en este momento.',
+        phSearchRepo: 'Buscar por nombre, descripción, etiqueta o versión...',
+        allFilter: 'Todos', detachedPill: 'Archivos Conservados',
+        detachedTitle: '🗄 Archivos Conservados en Disco (Sin Repo Activo)', detachedSub: 'Archivos mantenidos tras eliminar el repositorio',
+        badgeDetached: '🗄 ARCHIVO CONSERVADO', btnPauseRepo: 'Pausar Repo', btnResumeRepo: 'Reanudar Repo', btnCheckReleases: 'Comprobar',
+        btnEditOptions: 'Opciones', btnPurgeData: 'Limpiar Datos', btnDeleteRepo: 'Eliminar Repo',
+        lblVersionHistory: 'Historial de Versiones', optAllChannels: 'Todas (Stable + Beta)', optStableOnly: 'Solo Stable', optPrereleaseOnly: 'Solo Pre-release',
+        phFilterVersions: 'Filtrar versión o texto...', msgSelectVersion: 'Selecciona una versión a la izquierda para ver archivos y notas.',
+        phSearchFeed: 'Buscar en todo el historial...', hdrActiveDownloads: 'Descargas Activas', hdrActivityLog: 'Registro de Actividad', btnRefresh: 'Actualizar',
+        lblVersions: 'Versiones', lblSpace: 'Espacio', stReady: 'Listo', stPaused: 'En Pausa', stSyncing: 'Sincronizando...', stError: 'Error', stPartial: 'Parcial',
+        btnPauseShort: 'Pausa', btnResumeShort: 'Reanudar', noReposTitle: 'No hay repositorios activos', noReposSub: 'Haz clic en "Añadir GitHub / Nexus" arriba a la derecha.',
+        btnDownload: 'Descargar', btnBundleZip: 'ZIP Completo', lblArchivedFiles: 'Archivos', lblPatchNotes: 'Notas de Versión',
+        setGhTitle: 'GitHub API y Sincronización', setGhSub: 'Añade un token para subir el límite de 60 a 5.000 peticiones/hora.',
+        lblGhToken: 'GitHub Personal Access Token', lblCheckInterval: 'Intervalo (minutos)', setNexusTitle: 'Integración Nexus Mods',
+        setNotifTitle: 'Notificaciones', btnTestNotif: 'Enviar Prueba', setCredsTitle: 'Credenciales de Acceso', btnSaveSettings: 'Guardar Ajustes',
+        modalAddTitle: 'Añadir de GitHub o Nexus Mods', chkOnlyLatestTitle: '⚡ Descargar SOLO la última versión y las futuras',
+        btnCancel: 'Cancelar', btnAddHistory: 'Añadir y Descargar', modalEditTitle: 'Opciones de Repositorio', btnSaveChanges: 'Guardar Cambios',
+        modalPurgeTitle: 'Limpiar Datos del Repositorio', btnPurgeAndResync: '🧹 Eliminar datos y volver a descargar ahora', btnPurgeOnly: '⏸ Solo eliminar datos (dejar en pausa)',
+        btnDeleteKeepFiles: '📦 Eliminar Repo pero CONSERVAR Archivos', btnDeleteWipeFiles: '🗑 Eliminar Repo y BORRAR Archivos del Disco',
+        wizTitle: 'Asistente de Configuración y Manual — Release Vault', wizSub: 'Configuración paso a paso de Usuario, GitHub API, Nexus Mods, Bot de Telegram 24/7 y Comandos',
+        s1Title: '¡Bienvenido a Release Vault!', s1Desc: 'Esta plataforma privada supervisa tus proyectos de GitHub y mods de Nexus Mods, descargando cada versión con archivos, código fuente, SHA256 y notas.',
+        s1Hdr: '🔐 1. Configurar Credenciales de Administrador', donateBannerTitle: '☕ ¿Te gusta Release Vault? ¡Apoya el proyecto!',
+        donateBannerDesc: 'Puedes apoyar el desarrollo con una donación en PayPal.', prev: '← Atrás', next: 'Siguiente →', finish: '✅ Guardar e Iniciar'
+      },
+      fr: {
+        loginSub: 'Archive Privée & Notes de Version', lblUsername: 'Nom d\'utilisateur', lblPassword: 'Mot de passe', btnLogin: 'Connexion au Vault',
+        badgePrivate: 'PRIVÉ', tabRepos: 'Dépôts', tabFeed: 'Historique & Notes', tabActivity: 'File & Journaux', tabSettings: 'Paramètres',
+        btnDonate: 'Soutenir / Don', btnGuide: 'Guide & Assistant', pauseAll: 'Tout Suspendre', resumeAll: 'Tout Reprendre',
+        btnCheckNow: 'Vérifier', btnAddSource: 'Ajouter GitHub / Nexus',
+        bannerGlobalPaused: 'Synchronisation et téléchargements globaux en PAUSE.', btnResumeNow: '▶️ Tout Reprendre',
+        statMonitoredRepos: 'Dépôts Surveillés', statAutoCheck: 'Vérification auto active',
+        statArchivedReleases: 'Versions Archivées', statArchiveSize: 'Taille de l\'Archive',
+        statShaNotes: 'Avec SHA256 & Notes', statDiskSpace: 'Espace Disque',
+        filesDownloaded: 'fichiers téléchargés', freeSpace: 'libres', usedSpace: 'Utilisé', lastCheck: 'Dernier check',
+        inQueue: 'en file', noActiveDl: 'Aucun téléchargement actif.',
+        phSearchRepo: 'Rechercher par nom, description, tag ou version...',
+        allFilter: 'Tous', detachedPill: 'Archives Conservées',
+        detachedTitle: '🗄 Archives Conservées sur Disque (Sans Dépôt Actif)', detachedSub: 'Fichiers conservés après suppression du dépôt',
+        badgeDetached: '🗄 ARCHIVE CONSERVÉE', btnPauseRepo: 'Pause Dépôt', btnResumeRepo: 'Reprendre', btnCheckReleases: 'Vérifier',
+        btnEditOptions: 'Options', btnPurgeData: 'Purger Données', btnDeleteRepo: 'Supprimer Dépôt',
+        lblVersionHistory: 'Historique des Versions', optAllChannels: 'Toutes (Stable + Beta)', optStableOnly: 'Stable', optPrereleaseOnly: 'Pre-release',
+        phFilterVersions: 'Filtrer version ou notes...', msgSelectVersion: 'Sélectionnez une version à gauche pour voir les fichiers et notes.',
+        phSearchFeed: 'Rechercher dans tout l\'historique...', hdrActiveDownloads: 'Téléchargements Actifs', hdrActivityLog: 'Journal d\'Activité', btnRefresh: 'Actualiser',
+        lblVersions: 'Versions', lblSpace: 'Espace', stReady: 'Prêt', stPaused: 'En Pause', stSyncing: 'Sync...', stError: 'Erreur', stPartial: 'Partiel',
+        btnPauseShort: 'Pause', btnResumeShort: 'Reprendre', noReposTitle: 'Aucun dépôt actif', noReposSub: 'Cliquez sur "Ajouter GitHub / Nexus" en haut à droite.',
+        btnDownload: 'Télécharger', btnBundleZip: 'Bundle ZIP Complet', lblArchivedFiles: 'Fichiers Archivés', lblPatchNotes: 'Notes de Version',
+        setGhTitle: 'API GitHub & Synchronisation', setNexusTitle: 'Intégration Nexus Mods', setNotifTitle: 'Notifications', btnTestNotif: 'Tester',
+        setCredsTitle: 'Identifiants de Connexion', btnSaveSettings: 'Enregistrer Tout',
+        modalAddTitle: 'Ajouter depuis GitHub ou Nexus Mods', chkOnlyLatestTitle: '⚡ Télécharger UNIQUEMENT la dernière version et les futures',
+        btnCancel: 'Annuler', btnAddHistory: 'Ajouter & Télécharger', modalEditTitle: 'Options du Dépôt', btnSaveChanges: 'Enregistrer',
+        modalPurgeTitle: 'Purger les Données du Dépôt', btnPurgeAndResync: '🧹 Purger et retélécharger maintenant', btnPurgeOnly: '⏸ Purger uniquement (laisser en pause)',
+        btnDeleteKeepFiles: '📦 Supprimer le Dépôt mais CONSERVER les Fichiers', btnDeleteWipeFiles: '🗑 Supprimer le Dépôt + EFFACER les Fichiers',
+        wizTitle: 'Assistant de Configuration & Manuel — Release Vault', wizSub: 'Configuration étape par étape : Compte Admin, API GitHub, Nexus Mods, Bot Telegram 24/7 et Commandes',
+        s1Title: 'Bienvenue dans Release Vault !', s1Desc: 'Cette plateforme privée surveille vos projets GitHub et mods Nexus Mods, téléchargeant automatiquement chaque version avec fichiers, code source, SHA256 et notes.',
+        s1Hdr: '🔐 1. Définir les Identifiants Administrateur', donateBannerTitle: '☕ Vous aimez Release Vault ? Soutenez le projet !',
+        donateBannerDesc: 'Vous pouvez soutenir le développement avec un don PayPal.', prev: '← Retour', next: 'Suivant →', finish: '✅ Enregistrer et Lancer'
+      },
+      de: {
+        loginSub: 'Privates Release-Archiv & Patchnotes', lblUsername: 'Benutzername', lblPassword: 'Passwort', btnLogin: 'Im Vault anmelden',
+        badgePrivate: 'PRIVAT', tabRepos: 'Repositories', tabFeed: 'Verlauf & Patchnotes', tabActivity: 'Warteschlange & Logs', tabSettings: 'Einstellungen',
+        btnDonate: 'Unterstützen / Spenden', btnGuide: 'Anleitung & Assistent', pauseAll: 'Alle pausieren', resumeAll: 'Alle fortsetzen',
+        btnCheckNow: 'Jetzt prüfen', btnAddSource: 'GitHub / Nexus hinzufügen',
+        bannerGlobalPaused: 'Globale Synchronisierung und Downloads sind PAUSIERT.', btnResumeNow: '▶️ Alle fortsetzen',
+        statMonitoredRepos: 'Überwachte Repositories', statAutoCheck: 'Automatische Prüfung aktiv',
+        statArchivedReleases: 'Archivierte Releases', statArchiveSize: 'Archivgröße',
+        statShaNotes: 'Mit SHA256 & Patchnotes', statDiskSpace: 'Speicherplatz',
+        filesDownloaded: 'Dateien geladen', freeSpace: 'frei', usedSpace: 'Belegt', lastCheck: 'Letzter Check',
+        inQueue: 'in Warteschlange', noActiveDl: 'Momentan keine aktiven Downloads.',
+        phSearchRepo: 'Nach Repository, Beschreibung, Tag oder Version suchen...',
+        allFilter: 'Alle', detachedPill: 'Gespeicherte Archive',
+        detachedTitle: '🗄 Gespeicherte Archive auf Festplatte (Ohne aktives Repo)', detachedSub: 'Dateien nach Löschen des Repositories behalten',
+        badgeDetached: '🗄 GESPEICHERTES ARCHIV', btnPauseRepo: 'Repo pausieren', btnResumeRepo: 'Fortsetzen', btnCheckReleases: 'Prüfen',
+        btnEditOptions: 'Optionen', btnPurgeData: 'Daten löschen', btnDeleteRepo: 'Repo löschen',
+        lblVersionHistory: 'Versionsverlauf', optAllChannels: 'Alle (Stable + Beta)', optStableOnly: 'Nur Stable', optPrereleaseOnly: 'Nur Pre-release',
+        phFilterVersions: 'Version oder Patchnotes filtern...', msgSelectVersion: 'Wähle links eine Version aus, um Dateien und Patchnotes zu sehen.',
+        phSearchFeed: 'Im gesamten Verlauf suchen...', hdrActiveDownloads: 'Aktive Downloads', hdrActivityLog: 'Aktivitätsprotokoll', btnRefresh: 'Aktualisieren',
+        lblVersions: 'Versionen', lblSpace: 'Größe', stReady: 'Bereit', stPaused: 'Pausiert', stSyncing: 'Synchronisiere...', stError: 'Fehler', stPartial: 'Teilweise',
+        btnPauseShort: 'Pause', btnResumeShort: 'Weiter', noReposTitle: 'Keine aktiven Repositories', noReposSub: 'Klicke oben rechts auf "GitHub / Nexus hinzufügen".',
+        btnDownload: 'Herunterladen', btnBundleZip: 'Komplettes ZIP-Bundle', lblArchivedFiles: 'Archivierte Dateien', lblPatchNotes: 'Patchnotes / Änderungen',
+        setGhTitle: 'GitHub API & Automatische Synchronisierung', setNexusTitle: 'Nexus Mods Integration', setNotifTitle: 'Benachrichtigungen', btnTestNotif: 'Test senden',
+        setCredsTitle: 'Zugangsdaten', btnSaveSettings: 'Alle Einstellungen speichern',
+        modalAddTitle: 'Von GitHub oder Nexus Mods hinzufügen', chkOnlyLatestTitle: '⚡ NUR das neueste Release und zukünftige herunterladen',
+        btnCancel: 'Abbrechen', btnAddHistory: 'Hinzufügen & Laden', modalEditTitle: 'Repository-Optionen', btnSaveChanges: 'Speichern',
+        modalPurgeTitle: 'Repository-Daten bereinigen', btnPurgeAndResync: '🧹 Alle Daten löschen & sofort neu laden', btnPurgeOnly: '⏸ Nur Daten löschen (pausiert lassen)',
+        btnDeleteKeepFiles: '📦 Repository löschen, aber Dateien BEHALTEN', btnDeleteWipeFiles: '🗑 Repository + ALLE Dateien von Festplatte löschen',
+        wizTitle: 'Einrichtungsassistent & Handbuch — Release Vault', wizSub: 'Schritt-für-Schritt-Einrichtung für Admin-Konto, GitHub API, Nexus Mods, 24/7 Telegram-Bot & Befehle',
+        s1Title: 'Willkommen beim Release Vault!', s1Desc: 'Diese private Plattform überwacht Ihre GitHub-Projekte und Nexus Mods und lädt automatisch jede Version inklusive Binärdateien, Quellcode, SHA256 und Patchnotes herunter.',
+        s1Hdr: '🔐 1. Administrator-Zugangsdaten festlegen', donateBannerTitle: '☕ Gefällt dir Release Vault? Unterstütze das Projekt!',
+        donateBannerDesc: 'Du kannst die Entwicklung mit einer Spende über PayPal unterstützen.', prev: '← Zurück', next: 'Weiter →', finish: '✅ Speichern & Starten'
+      },
+      pt: {
+        loginSub: 'Arquivo Privado de Releases e Notas', lblUsername: 'Usuário', lblPassword: 'Senha', btnLogin: 'Entrar no Vault',
+        badgePrivate: 'PRIVADO', tabRepos: 'Repositórios', tabFeed: 'Histórico e Notas', tabActivity: 'Fila e Logs', tabSettings: 'Configurações',
+        btnDonate: 'Apoiar / Doar', btnGuide: 'Guia e Assistente', pauseAll: 'Pausar Tudo', resumeAll: 'Retomar Tudo',
+        btnCheckNow: 'Verificar Agora', btnAddSource: 'Adicionar GitHub / Nexus',
+        bannerGlobalPaused: 'Sincronização e downloads globais em PAUSA.', btnResumeNow: '▶️ Retomar Tudo',
+        statMonitoredRepos: 'Repositórios Monitorados', statAutoCheck: 'Verificação automática ativa',
+        statArchivedReleases: 'Releases Arquivadas', statArchiveSize: 'Tamanho do Arquivo',
+        statShaNotes: 'Com SHA256 e Notas', statDiskSpace: 'Espaço em Disco',
+        filesDownloaded: 'arquivos baixados', freeSpace: 'livres', usedSpace: 'Usado', lastCheck: 'Última verificação',
+        inQueue: 'na fila', noActiveDl: 'Nenhum download ativo no momento.',
+        phSearchRepo: 'Buscar por nome, descrição, tag ou versão...',
+        allFilter: 'Todos', detachedPill: 'Arquivos Mantidos',
+        detachedTitle: '🗄 Arquivos Mantidos no Disco (Sem Repositório Ativo)', detachedSub: 'Arquivos mantidos após excluir o repositório',
+        badgeDetached: '🗄 ARQUIVO MANTIDO', btnPauseRepo: 'Pausar Repo', btnResumeRepo: 'Retomar Repo', btnCheckReleases: 'Verificar',
+        btnEditOptions: 'Opções', btnPurgeData: 'Limpar Dados', btnDeleteRepo: 'Excluir Repo',
+        lblVersionHistory: 'Histórico de Versões', optAllChannels: 'Todas (Stable + Beta)', optStableOnly: 'Apenas Stable', optPrereleaseOnly: 'Apenas Pre-release',
+        phFilterVersions: 'Filtrar versão ou notas...', msgSelectVersion: 'Selecione uma versão à esquerda para ver arquivos e notas.',
+        phSearchFeed: 'Buscar em todo o histórico...', hdrActiveDownloads: 'Downloads Ativos', hdrActivityLog: 'Registro de Atividades', btnRefresh: 'Atualizar',
+        lblVersions: 'Versões', lblSpace: 'Espaço', stReady: 'Pronto', stPaused: 'Pausado', stSyncing: 'Sincronizando...', stError: 'Erro', stPartial: 'Parcial',
+        btnPauseShort: 'Pausa', btnResumeShort: 'Retomar', noReposTitle: 'Nenhum repositório ativo', noReposSub: 'Clique em "Adicionar GitHub / Nexus" no canto superior direito.',
+        btnDownload: 'Baixar', btnBundleZip: 'Pacote ZIP Completo', lblArchivedFiles: 'Arquivos Arquivados', lblPatchNotes: 'Notas de Lançamento',
+        setGhTitle: 'API do GitHub e Sincronização', setNexusTitle: 'Integração Nexus Mods', setNotifTitle: 'Notificações', btnTestNotif: 'Enviar Teste',
+        setCredsTitle: 'Credenciais de Acesso', btnSaveSettings: 'Salvar Configurações',
+        modalAddTitle: 'Adicionar do GitHub ou Nexus Mods', chkOnlyLatestTitle: '⚡ Baixar APENAS a última versão e as futuras',
+        btnCancel: 'Cancelar', btnAddHistory: 'Adicionar e Baixar', modalEditTitle: 'Opções do Repositório', btnSaveChanges: 'Salvar',
+        modalPurgeTitle: 'Limpar Dados do Repositório', btnPurgeAndResync: '🧹 Limpar dados e baixar novamente agora', btnPurgeOnly: '⏸ Apenas limpar dados (deixar pausado)',
+        btnDeleteKeepFiles: '📦 Excluir Repositório mas MANTER os Arquivos', btnDeleteWipeFiles: '🗑 Excluir Repositório + APAGAR Todos os Arquivos',
+        wizTitle: 'Assistente de Configuração e Manual — Release Vault', wizSub: 'Configuração passo a passo de Admin, API GitHub, Nexus Mods, Bot Telegram 24/7 e Comandos',
+        s1Title: 'Bem-vindo ao Release Vault!', s1Desc: 'Esta plataforma privada monitora seus projetos do GitHub e mods do Nexus Mods, baixando automaticamente cada versão com binários, código-fonte, SHA256 e notas.',
+        s1Hdr: '🔐 1. Definir Credenciais de Administrador', donateBannerTitle: '☕ Gostou do Release Vault? Apoie o projeto!',
+        donateBannerDesc: 'Você pode apoiar o desenvolvimento com uma doação via PayPal.', prev: '← Voltar', next: 'Avançar →', finish: '✅ Salvar e Iniciar'
+      },
+      ru: {
+        loginSub: 'Приватный Архив Релизов и Патчноутов', lblUsername: 'Имя пользователя', lblPassword: 'Пароль', btnLogin: 'Войти в Vault',
+        badgePrivate: 'ПРИВАТНЫЙ', tabRepos: 'Репозитории', tabFeed: 'История и Патчноуты', tabActivity: 'Очередь и Логи', tabSettings: 'Настройки',
+        btnDonate: 'Поддержать / Донат', btnGuide: 'Гид и Мастер', pauseAll: 'Пауза Всех', resumeAll: 'Возобновить Все',
+        btnCheckNow: 'Проверить', btnAddSource: 'Добавить GitHub / Nexus',
+        bannerGlobalPaused: 'Глобальная синхронизация и загрузки на ПАУЗЕ.', btnResumeNow: '▶️ Возобновить Все',
+        statMonitoredRepos: 'Отслеживаемые Репо', statAutoCheck: 'Автопроверка активна',
+        statArchivedReleases: 'Архивировано Релизов', statArchiveSize: 'Размер Архива',
+        statShaNotes: 'С SHA256 и Патчноутами', statDiskSpace: 'Место на Диске',
+        filesDownloaded: 'файлов скачано', freeSpace: 'свободно', usedSpace: 'Занято', lastCheck: 'Проверка',
+        inQueue: 'в очереди', noActiveDl: 'Нет активных загрузок.',
+        phSearchRepo: 'Поиск по названию, описанию, тегу или версии...',
+        allFilter: 'Все', detachedPill: 'Сохраненные Архивы',
+        detachedTitle: '🗄 Сохраненные Архивы на Диске (Без Активного Репо)', detachedSub: 'Файлы, сохраненные после удаления репозитория',
+        badgeDetached: '🗄 СОХРАНЕННЫЙ АРХИВ', btnPauseRepo: 'Пауза Репо', btnResumeRepo: 'Возобновить', btnCheckReleases: 'Проверить',
+        btnEditOptions: 'Опции', btnPurgeData: 'Очистить Данные', btnDeleteRepo: 'Удалить Репо',
+        lblVersionHistory: 'История Версий', optAllChannels: 'Все (Stable + Beta)', optStableOnly: 'Только Stable', optPrereleaseOnly: 'Только Pre-release',
+        phFilterVersions: 'Фильтр версий или текста...', msgSelectVersion: 'Выберите версию слева для просмотра файлов и патчноутов.',
+        phSearchFeed: 'Поиск по всей истории...', hdrActiveDownloads: 'Активные Загрузки', hdrActivityLog: 'Журнал Событий', btnRefresh: 'Обновить',
+        lblVersions: 'Версии', lblSpace: 'Размер', stReady: 'Готово', stPaused: 'Пауза', stSyncing: 'Синхронизация...', stError: 'Ошибка', stPartial: 'Частично',
+        btnPauseShort: 'Пауза', btnResumeShort: 'Старт', noReposTitle: 'Нет активных репозиториев', noReposSub: 'Нажмите «Добавить GitHub / Nexus» в правом верхнем углу.',
+        btnDownload: 'Скачать', btnBundleZip: 'Полный ZIP Архив', lblArchivedFiles: 'Файлы Релиза', lblPatchNotes: 'Патчноуты / Изменения',
+        setGhTitle: 'GitHub API и Синхронизация', setNexusTitle: 'Интеграция Nexus Mods', setNotifTitle: 'Уведомления', btnTestNotif: 'Тест',
+        setCredsTitle: 'Учетные Данные', btnSaveSettings: 'Сохранить Настройки',
+        modalAddTitle: 'Добавить из GitHub или Nexus Mods', chkOnlyLatestTitle: '⚡ Скачать ТОЛЬКО последний релиз и будущие обновления',
+        btnCancel: 'Отмена', btnAddHistory: 'Добавить и Скачать', modalEditTitle: 'Настройки Репозитория', btnSaveChanges: 'Сохранить',
+        modalPurgeTitle: 'Очистить Данные Репозитория', btnPurgeAndResync: '🧹 Удалить данные и перекачать сейчас', btnPurgeOnly: '⏸ Только удалить данные (оставить на паузе)',
+        btnDeleteKeepFiles: '📦 Удалить Репо, но СОХРАНИТЬ Файлы на Диске', btnDeleteWipeFiles: '🗑 Удалить Репо + УДАЛИТЬ Все Файлы с Диска',
+        wizTitle: 'Мастер Настройки и Руководство — Release Vault', wizSub: 'Пошаговая настройка аккаунта, GitHub API, Nexus Mods, Telegram-бота 24/7 и команд',
+        s1Title: 'Добро пожаловать в Release Vault!', s1Desc: 'Эта приватная платформа отслеживает ваши проекты GitHub и моды Nexus Mods, автоматически скачивая каждый релиз с файлами, исходным кодом, SHA256 и патчноутами.',
+        s1Hdr: '🔐 1. Установите учетные данные администратора', donateBannerTitle: '☕ Нравится Release Vault? Поддержите проект!',
+        donateBannerDesc: 'Вы можете поддержать разработку донатом через PayPal.', prev: '← Назад', next: 'Далее →', finish: '✅ Сохранить и Запустить'
+      },
+      zh: {
+        loginSub: '私有版本归档与更新日志系统', lblUsername: '用户名', lblPassword: '密码', btnLogin: '登录 Vault',
+        badgePrivate: '私有', tabRepos: '仓库列表', tabFeed: '历史与更新日志', tabActivity: '队列与日志', tabSettings: '系统设置',
+        btnDonate: '支持 / 捐赠', btnGuide: '指南与向导', pauseAll: '全部暂停', resumeAll: '全部恢复',
+        btnCheckNow: '立即检查', btnAddSource: '添加 GitHub / Nexus',
+        bannerGlobalPaused: '全局同步与下载已暂停。', btnResumeNow: '▶️ 立即恢复全部',
+        statMonitoredRepos: '监控仓库数', statAutoCheck: '自动检查已启用',
+        statArchivedReleases: '已归档版本', statArchiveSize: '归档总大小',
+        statShaNotes: '包含 SHA256 与更新日志', statDiskSpace: '服务器磁盘空间',
+        filesDownloaded: '个已下载文件', freeSpace: '可用', usedSpace: '已用', lastCheck: '上次检查',
+        inQueue: '队列中', noActiveDl: '当前没有活动下载。',
+        phSearchRepo: '按仓库名称、描述、标签或版本搜索...',
+        allFilter: '全部', detachedPill: '保留的归档',
+        detachedTitle: '🗄 磁盘上保留的归档（无活动仓库）', detachedSub: '删除仓库后保留在服务器上的文件与更新日志',
+        badgeDetached: '🗄 保留的归档', btnPauseRepo: '暂停仓库', btnResumeRepo: '恢复仓库', btnCheckReleases: '检查更新',
+        btnEditOptions: '修改选项', btnPurgeData: '清理数据', btnDeleteRepo: '删除仓库',
+        lblVersionHistory: '版本历史', optAllChannels: '全部 (Stable + Beta)', optStableOnly: '仅正式版', optPrereleaseOnly: '仅预览版',
+        phFilterVersions: '筛选版本号或更新日志内容...', msgSelectVersion: '请在左侧选择一个版本以查看文件和更新日志。',
+        phSearchFeed: '搜索全部历史记录...', hdrActiveDownloads: '实时活动下载', hdrActivityLog: '活动历史日志', btnRefresh: '刷新',
+        lblVersions: '版本', lblSpace: '大小', stReady: '就绪', stPaused: '已暂停', stSyncing: '同步中...', stError: '错误', stPartial: '部分完成',
+        btnPauseShort: '暂停', btnResumeShort: '恢复', noReposTitle: '暂无活动仓库', noReposSub: '点击右上角的“添加 GitHub / Nexus”开始归档。',
+        btnDownload: '下载', btnBundleZip: '完整 ZIP 打包下载', lblArchivedFiles: '已归档文件', lblPatchNotes: '更新日志 / Patch Notes',
+        setGhTitle: 'GitHub API 与自动同步', setNexusTitle: 'Nexus Mods 集成', setNotifTitle: '通知系统', btnTestNotif: '发送测试通知',
+        setCredsTitle: '登录凭据', btnSaveSettings: '保存所有设置',
+        modalAddTitle: '从 GitHub 或 Nexus Mods 添加', chkOnlyLatestTitle: '⚡ 仅下载最新版本及未来更新',
+        btnCancel: '取消', btnAddHistory: '添加并下载', modalEditTitle: '仓库选项', btnSaveChanges: '保存更改',
+        modalPurgeTitle: '清理 / 删除仓库数据', btnPurgeAndResync: '🧹 删除所有数据并立即重新下载', btnPurgeOnly: '⏸ 仅删除所有数据（保持暂停）',
+        btnDeleteKeepFiles: '📦 删除仓库但保留已下载文件', btnDeleteWipeFiles: '🗑 删除仓库并彻底清除磁盘文件',
+        wizTitle: '设置向导与完整指南 — Release Vault', wizSub: '分步配置管理员账户、GitHub API、Nexus Mods、24/7 Telegram 机器人与命令说明',
+        s1Title: '欢迎使用 Release Vault！', s1Desc: '该私有平台自动监控您的 GitHub 项目与 Nexus Mods 模组，自动下载并归档每个版本的二进制文件、源代码、SHA256 校验值及 Markdown 更新日志。',
+        s1Hdr: '🔐 1. 设置管理员登录凭据', donateBannerTitle: '☕ 喜欢 Release Vault 吗？欢迎支持本项目！',
+        donateBannerDesc: '如果该项目对您有帮助，欢迎通过 PayPal 捐赠支持开发。', prev: '← 上一步', next: '下一步 →', finish: '✅ 保存并启动'
+      },
+      ja: {
+        loginSub: 'プライベートリリース保管庫 & パッチノート', lblUsername: 'ユーザー名', lblPassword: 'パスワード', btnLogin: 'Vault にログイン',
+        badgePrivate: 'プライベート', tabRepos: 'リポジトリ', tabFeed: '履歴・パッチノート', tabActivity: 'キュー・ログ', tabSettings: '設定',
+        btnDonate: 'サポート / 寄付', btnGuide: 'ガイド & ウィザード', pauseAll: 'すべて一時停止', resumeAll: 'すべて再開',
+        btnCheckNow: '今すぐ確認', btnAddSource: 'GitHub / Nexus 追加',
+        bannerGlobalPaused: '全体の同期とダウンロードは一時停止中です。', btnResumeNow: '▶️ すべて再開',
+        statMonitoredRepos: '監視中のリポジトリ', statAutoCheck: '自動チェック有効',
+        statArchivedReleases: '保管済みリリース', statArchiveSize: 'アーカイブ容量',
+        statShaNotes: 'SHA256 & パッチノート付', statDiskSpace: 'ディスク空き容量',
+        filesDownloaded: 'ファイル保存済', freeSpace: '空き', usedSpace: '使用中', lastCheck: '最終確認',
+        inQueue: '待機中', noActiveDl: '現在アクティブなダウンロードはありません。',
+        phSearchRepo: 'リポジトリ名、説明、タグ、バージョンで検索...',
+        allFilter: 'すべて', detachedPill: '保存済みアーカイブ',
+        detachedTitle: '🗄 ディスク上の保存済みアーカイブ（監視解除済）', detachedSub: 'リポジトリ削除後もサーバーに保持されているファイル',
+        badgeDetached: '🗄 保存済みアーカイブ', btnPauseRepo: '一時停止', btnResumeRepo: '再開', btnCheckReleases: '更新確認',
+        btnEditOptions: 'オプション', btnPurgeData: 'データ消去', btnDeleteRepo: 'リポジトリ削除',
+        lblVersionHistory: 'バージョン履歴', optAllChannels: 'すべて (Stable + Beta)', optStableOnly: 'Stable のみ', optPrereleaseOnly: 'Pre-release のみ',
+        phFilterVersions: 'バージョンやパッチノートを検索...', msgSelectVersion: '左側からバージョンを選択するとファイルとパッチノートが表示されます。',
+        phSearchFeed: '全履歴から検索...', hdrActiveDownloads: '進行中のダウンロード', hdrActivityLog: 'アクティビティログ', btnRefresh: '更新',
+        lblVersions: 'バージョン', lblSpace: 'サイズ', stReady: '完了', stPaused: '一時停止', stSyncing: '同期中...', stError: 'エラー', stPartial: '一部未完了',
+        btnPauseShort: '停止', btnResumeShort: '再開', noReposTitle: 'アクティブなリポジトリがありません', noReposSub: '右上の「GitHub / Nexus 追加」をクリックして開始してください。',
+        btnDownload: 'ダウンロード', btnBundleZip: '一括 ZIP ダウンロード', lblArchivedFiles: '保存ファイル一覧', lblPatchNotes: 'パッチノート / 変更点',
+        setGhTitle: 'GitHub API & 自動同期', setNexusTitle: 'Nexus Mods 連携', setNotifTitle: '通知設定', btnTestNotif: 'テスト送信',
+        setCredsTitle: 'ログイン認証情報', btnSaveSettings: '設定をすべて保存',
+        modalAddTitle: 'GitHub または Nexus Mods から追加', chkOnlyLatestTitle: '⚡ 最新リリースと今後の更新のみをダウンロード',
+        btnCancel: 'キャンセル', btnAddHistory: '追加してダウンロード', modalEditTitle: 'リポジトリ設定', btnSaveChanges: '保存',
+        modalPurgeTitle: 'リポジトリデータの消去', btnPurgeAndResync: '🧹 データを消去して現在の設定で再ダウンロード', btnPurgeOnly: '⏸ データのみ消去（一時停止のままにする）',
+        btnDeleteKeepFiles: '📦 リポジトリを削除し、ファイルはディスクに残す', btnDeleteWipeFiles: '🗑 リポジトリと全ファイルを完全に削除する',
+        wizTitle: 'セットアップウィザード＆完全ガイド — Release Vault', wizSub: '管理者アカウント、GitHub API、Nexus Mods、24時間稼働 Telegram Bot、コマンドのステップバイステップ設定',
+        s1Title: 'Release Vault へようこそ！', s1Desc: 'このプライベートプラットフォームは GitHub プロジェクトや Nexus Mods を監視し、バイナリ、ソースコード、SHA256、Markdown パッチノートを含む全リリースを自動ダウンロード・整理します。',
+        s1Hdr: '🔐 1. 管理者ログイン情報の設定', donateBannerTitle: '☕ Release Vault を気に入っていただけましたか？',
+        donateBannerDesc: 'PayPal での寄付を通じてプロジェクトの開発をサポートできます。', prev: '← 戻る', next: '次へ →', finish: '✅ 保存して開始'
+      },
+      ko: {
+        loginSub: '프라이빗 릴리스 아카이브 & 패치노트', lblUsername: '사용자 이름', lblPassword: '비밀번호', btnLogin: 'Vault 로그인',
+        badgePrivate: '프라이빗', tabRepos: '저장소', tabFeed: '릴리스 기록 & 패치노트', tabActivity: '대기열 & 로그', tabSettings: '설정',
+        btnDonate: '후원 / 기부', btnGuide: '가이드 & 마법사', pauseAll: '전체 일시정지', resumeAll: '전체 재개',
+        btnCheckNow: '지금 확인', btnAddSource: 'GitHub / Nexus 추가',
+        bannerGlobalPaused: '전체 동기화 및 다운로드가 일시정지되었습니다.', btnResumeNow: '▶️ 전체 재개',
+        statMonitoredRepos: '모니터링 중인 저장소', statAutoCheck: '자동 확인 활성화됨',
+        statArchivedReleases: '보관된 릴리스', statArchiveSize: '아카이브 크기',
+        statShaNotes: 'SHA256 및 패치노트 포함', statDiskSpace: '서버 디스크 공간',
+        filesDownloaded: '개 파일 다운로드됨', freeSpace: '여유', usedSpace: '사용됨', lastCheck: '마지막 확인',
+        inQueue: '대기 중', noActiveDl: '현재 진행 중인 다운로드가 없습니다.',
+        phSearchRepo: '저장소 이름, 설명, 태그 또는 버전으로 검색...',
+        allFilter: '전체', detachedPill: '보관된 아카이브',
+        detachedTitle: '🗄 디스크에 보관된 아카이브 (활성 저장소 없음)', detachedSub: '저장소 삭제 후에도 서버에 유지된 파일 및 패치노트',
+        badgeDetached: '🗄 보관된 아카이브', btnPauseRepo: '일시정지', btnResumeRepo: '재개', btnCheckReleases: '확인',
+        btnEditOptions: '옵션 수정', btnPurgeData: '데이터 비우기', btnDeleteRepo: '저장소 삭제',
+        lblVersionHistory: '버전 기록', optAllChannels: '전체 (Stable + Beta)', optStableOnly: 'Stable 전용', optPrereleaseOnly: 'Pre-release 전용',
+        phFilterVersions: '버전 또는 패치노트 검색...', msgSelectVersion: '왼쪽에서 버전을 선택하면 파일과 패치노트가 표시됩니다.',
+        phSearchFeed: '전체 기록 검색...', hdrActiveDownloads: '실시간 다운로드', hdrActivityLog: '활동 로그', btnRefresh: '새로고침',
+        lblVersions: '버전', lblSpace: '크기', stReady: '준비됨', stPaused: '일시정지됨', stSyncing: '동기화 중...', stError: '오류', stPartial: '부분 완료',
+        btnPauseShort: '정지', btnResumeShort: '재개', noReposTitle: '활성 저장소가 없습니다', noReposSub: '오른쪽 상단의 "GitHub / Nexus 추가"를 클릭하세요.',
+        btnDownload: '다운로드', btnBundleZip: '전체 ZIP 번들', lblArchivedFiles: '보관된 파일', lblPatchNotes: '패치노트 / 변경사항',
+        setGhTitle: 'GitHub API 및 자동 동기화', setNexusTitle: 'Nexus Mods 연동', setNotifTitle: '알림 설정', btnTestNotif: '테스트 알림 전송',
+        setCredsTitle: '로그인 자격 증명', btnSaveSettings: '모든 설정 저장',
+        modalAddTitle: 'GitHub 또는 Nexus Mods에서 추가', chkOnlyLatestTitle: '⚡ 최신 릴리스와 향후 업데이트만 다운로드',
+        btnCancel: '취소', btnAddHistory: '추가 및 다운로드', modalEditTitle: '저장소 옵션', btnSaveChanges: '변경사항 저장',
+        modalPurgeTitle: '저장소 데이터 비우기', btnPurgeAndResync: '🧹 모든 데이터 삭제 후 즉시 다시 다운로드', btnPurgeOnly: '⏸ 데이터만 삭제 (일시정지 상태 유지)',
+        btnDeleteKeepFiles: '📦 저장소는 삭제하고 다운로드된 파일은 유지', btnDeleteWipeFiles: '🗑 저장소 및 디스크의 모든 파일 완전 삭제',
+        wizTitle: '설정 마법사 및 전체 가이드 — Release Vault', wizSub: '관리자 계정, GitHub API, Nexus Mods, 24/7 텔레그램 봇 및 명령어 단계별 설정',
+        s1Title: 'Release Vault에 오신 것을 환영합니다!', s1Desc: '이 프라이빗 플랫폼은 GitHub 프로젝트와 Nexus Mods를 모니터링하여 바이너리, 소스 코드, SHA256 체크섬 및 패치 노트를 자동으로 다운로드하고 분류합니다.',
+        s1Hdr: '🔐 1. 관리자 로그인 자격 증명 설정', donateBannerTitle: '☕ Release Vault가 마음에 드시나요? 프로젝트를 후원해 주세요!',
+        donateBannerDesc: 'PayPal 기부를 통해 프로젝트 개발을 응원하실 수 있습니다.', prev: '← 이전', next: '다음 →', finish: '✅ 저장 및 시작'
+      }
+    };
+
+    function tr(key) {
+      const dict = I18N[currentLang] || I18N.it;
+      return dict[key] || I18N.it[key] || I18N.en[key] || key;
+    }
+
+    function applyLanguageUI(lang) {
+      if (!I18N[lang]) lang = 'it';
+      currentLang = lang;
+      localStorage.setItem('vault_lang', lang);
+      document.documentElement.lang = lang;
+
+      ['header-lang-select', 'wiz-lang-select', 'login-lang-select'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) sel.value = lang;
+      });
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const val = tr(key);
+        if (val) el.textContent = val;
+      });
+
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const val = tr(key);
+        if (val) el.setAttribute('placeholder', val);
+      });
+
+      updateGlobalPauseUI(globalPaused);
+      if (reposList && reposList.length > 0) {
+        renderCategoryPills();
+        renderReposGrid();
+      }
+      if (currentRepoDetail) {
+        renderRepoVersionsList();
+        renderSelectedReleaseInspector();
+      }
+    }
+
+    async function changeLanguage(lang) {
+      applyLanguageUI(lang);
+      try {
+        await apiFetch('/api/settings', {
+          method: 'PUT',
+          body: JSON.stringify({ language: lang })
+        });
+      } catch {}
+    }
+
+    async function openSetupWizard(isFirstRun = false) {
+      document.getElementById('modal-setup-wizard').classList.remove('hidden');
+      try {
+        const s = await apiFetch('/api/settings');
+        document.getElementById('wiz-admin-user').value = s.auth_username || 'admin';
+        document.getElementById('wiz-admin-pass').value = '';
+        document.getElementById('wiz-check-interval').value = s.check_interval_minutes || '60';
+        document.getElementById('wiz-nexus-user').value = s.nexus_username || '';
+        document.getElementById('wiz-tg-token').value = s.telegram_bot_token || '';
+        document.getElementById('wiz-tg-chat').value = s.telegram_chat_id || '';
+        document.getElementById('wiz-discord-webhook').value = s.discord_webhook_url || '';
+        if (s.language) applyLanguageUI(s.language);
+      } catch {}
+      goToWizardStep(1);
+    }
+
+    function closeSetupWizard() {
+      document.getElementById('modal-setup-wizard').classList.add('hidden');
+    }
+
+    function goToWizardStep(step) {
+      currentWizardStep = Math.max(1, Math.min(5, step));
+      for (let i = 1; i <= 5; i++) {
+        const panel = document.getElementById(`wiz-step-${i}`);
+        const tab = document.getElementById(`wiz-tab-${i}`);
+        if (i === currentWizardStep) {
+          if (panel) panel.classList.remove('hidden');
+          if (tab) tab.className = 'py-2 px-2 rounded-xl border text-center transition truncate bg-indigo-600 text-white border-indigo-500 shadow';
+        } else {
+          if (panel) panel.classList.add('hidden');
+          if (tab) tab.className = 'py-2 px-2 rounded-xl border text-center transition truncate bg-bg-950 text-slate-400 border-slate-800 hover:text-white';
+        }
+      }
+      const prevBtn = document.getElementById('wiz-btn-prev');
+      const nextBtn = document.getElementById('wiz-btn-next');
+      const finishBtn = document.getElementById('wiz-btn-finish');
+      if (prevBtn) prevBtn.style.visibility = currentWizardStep === 1 ? 'hidden' : 'visible';
+      if (currentWizardStep === 5) {
+        if (nextBtn) nextBtn.classList.add('hidden');
+        if (finishBtn) finishBtn.classList.remove('hidden');
+      } else {
+        if (nextBtn) nextBtn.classList.remove('hidden');
+        if (finishBtn) finishBtn.classList.add('hidden');
+      }
+    }
+
+    function nextWizardStep() {
+      if (currentWizardStep < 5) goToWizardStep(currentWizardStep + 1);
+    }
+
+    function prevWizardStep() {
+      if (currentWizardStep > 1) goToWizardStep(currentWizardStep - 1);
+    }
+
+    async function completeSetupWizard() {
+      try {
+        const ghToken = document.getElementById('wiz-gh-token').value.trim();
+        const nxKey = document.getElementById('wiz-nexus-apikey').value.trim();
+        const nxSess = document.getElementById('wiz-nexus-session').value.trim();
+        await apiFetch('/api/setup/complete', {
+          method: 'POST',
+          body: JSON.stringify({
+            language: currentLang,
+            admin_username: document.getElementById('wiz-admin-user').value.trim(),
+            admin_password: document.getElementById('wiz-admin-pass').value,
+            github_token: ghToken || '__KEEP__',
+            check_interval_minutes: document.getElementById('wiz-check-interval').value || '60',
+            nexus_username: document.getElementById('wiz-nexus-user').value.trim(),
+            nexus_api_key: nxKey || '__KEEP__',
+            nexus_session_cookie: nxSess || '__KEEP__',
+            telegram_bot_token: document.getElementById('wiz-tg-token').value.trim(),
+            telegram_chat_id: document.getElementById('wiz-tg-chat').value.trim(),
+            discord_webhook_url: document.getElementById('wiz-discord-webhook').value.trim()
+          })
+        });
+        closeSetupWizard();
+        showToast('✅ Release Vault!', 'success');
+        await refreshAll();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // Boot
+    applyLanguageUI(currentLang);
+    checkSession();
+  </script>
+</body>
+</html>
