@@ -896,7 +896,8 @@ def build_main_reply_keyboard(lang: str) -> Dict[str, Any]:
             ],
         ],
         "resize_keyboard": True,
-        "is_persistent": True,
+        "one_time_keyboard": True,
+        "is_persistent": False,
     }
 
 
