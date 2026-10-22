@@ -108,6 +108,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ Non autorizzato",
         "expired_req": "⚠️ Richiesta scaduta o già elaborata.",
         "inspect_error": "❌ Impossibile analizzare",
+        "btn_patch_notes": "📝 Patch Notes",
+        "btn_releases_history": "📚 Storico Release",
+        "view_patch_notes_hint": "Seleziona una release per visualizzare le sue Patch Notes complete:",
+        "patch_notes_truncated": "Note troncate per limiti di Telegram. File completo archiviato su disco in PATCH_NOTES.md",
+        "reply_btn_status": "📊 Status",
+        "reply_btn_menu": "📁 Categorie",
+        "reply_btn_sync": "🔄 Check Release",
+        "reply_btn_lang": "🌐 Lingua",
     },
     "en": {
         "bot_title": "Release Vault - Private Bot",
@@ -176,6 +184,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ Unauthorized",
         "expired_req": "⚠️ Request expired or already processed.",
         "inspect_error": "❌ Unable to inspect",
+        "btn_patch_notes": "📝 Patch Notes",
+        "btn_releases_history": "📚 Release History",
+        "view_patch_notes_hint": "Select a release to view its complete Patch Notes:",
+        "patch_notes_truncated": "Notes truncated due to Telegram length limit. Full file archived on disk in PATCH_NOTES.md",
+        "reply_btn_status": "📊 Status",
+        "reply_btn_menu": "📁 Categories",
+        "reply_btn_sync": "🔄 Check Releases",
+        "reply_btn_lang": "🌐 Language",
     },
     "es": {
         "bot_title": "Release Vault - Bot Privado",
@@ -244,6 +260,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ No autorizado",
         "expired_req": "⚠️ Solicitud expirada o ya procesada.",
         "inspect_error": "❌ Imposible analizar",
+        "btn_patch_notes": "📝 Notas del Parche",
+        "btn_releases_history": "📚 Historial de Versiones",
+        "view_patch_notes_hint": "Selecciona una versión para ver sus Notas de parche completas:",
+        "patch_notes_truncated": "Notas truncadas por límites de Telegram. Archivo completo guardado en disco en PATCH_NOTES.md",
+        "reply_btn_status": "📊 Estado",
+        "reply_btn_menu": "📁 Categorías",
+        "reply_btn_sync": "🔄 Verificar Versiones",
+        "reply_btn_lang": "🌐 Idioma",
     },
     "fr": {
         "bot_title": "Release Vault - Bot Privé",
@@ -312,6 +336,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ Non autorisé",
         "expired_req": "⚠️ Demande expirée ou déjà traitée.",
         "inspect_error": "❌ Impossible d'analyser",
+        "btn_patch_notes": "📝 Notes de Version",
+        "btn_releases_history": "📚 Historique des Versions",
+        "view_patch_notes_hint": "Sélectionnez une version pour afficher ses Notes de version complètes :",
+        "patch_notes_truncated": "Notes tronquées en raison de la limite de Telegram. Fichier complet sur disque dans PATCH_NOTES.md",
+        "reply_btn_status": "📊 Statut",
+        "reply_btn_menu": "📁 Catégories",
+        "reply_btn_sync": "🔄 Vérifier Mises à jour",
+        "reply_btn_lang": "🌐 Langue",
     },
     "de": {
         "bot_title": "Release Vault - Privater Bot",
@@ -380,6 +412,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ Nicht autorisiert",
         "expired_req": "⚠️ Anfrage abgelaufen oder bereits verarbeitet.",
         "inspect_error": "❌ Analyse nicht möglich",
+        "btn_patch_notes": "📝 Patch-Hinweise",
+        "btn_releases_history": "📚 Versionsverlauf",
+        "view_patch_notes_hint": "Wähle eine Version, um vollständige Patch-Hinweise anzuzeigen:",
+        "patch_notes_truncated": "Hinweise wegen Telegram-Längenbegrenzung gekürzt. Vollständige Datei auf Festplatte in PATCH_NOTES.md",
+        "reply_btn_status": "📊 Status",
+        "reply_btn_menu": "📁 Kategorien",
+        "reply_btn_sync": "🔄 Releases prüfen",
+        "reply_btn_lang": "🌐 Sprache",
     },
     "pt": {
         "bot_title": "Release Vault - Bot Privado",
@@ -448,6 +488,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ Não autorizado",
         "expired_req": "⚠️ Pedido expirado ou já processado.",
         "inspect_error": "❌ Não foi possível inspecionar",
+        "btn_patch_notes": "📝 Notas da Versão",
+        "btn_releases_history": "📚 Histórico de Versões",
+        "view_patch_notes_hint": "Selecione uma versão para visualizar as Notas completas:",
+        "patch_notes_truncated": "Notas truncadas pelo limite do Telegram. Arquivo completo no disco em PATCH_NOTES.md",
+        "reply_btn_status": "📊 Status",
+        "reply_btn_menu": "📁 Categorias",
+        "reply_btn_sync": "🔄 Verificar Versões",
+        "reply_btn_lang": "🌐 Idioma",
     },
     "ru": {
         "bot_title": "Release Vault - Приватный Бот",
@@ -516,6 +564,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ Не авторизован",
         "expired_req": "⚠️ Запрос устарел или уже обработан.",
         "inspect_error": "❌ Не удалось проанализировать",
+        "btn_patch_notes": "📝 Список изменений",
+        "btn_releases_history": "📚 История релизов",
+        "view_patch_notes_hint": "Выберите релиз для просмотра полного списка изменений:",
+        "patch_notes_truncated": "Заметки сокращены из-за лимита длины Telegram. Полный файл на диске в PATCH_NOTES.md",
+        "reply_btn_status": "📊 Статус",
+        "reply_btn_menu": "📁 Категории",
+        "reply_btn_sync": "🔄 Проверить релизы",
+        "reply_btn_lang": "🌐 Язык",
     },
     "zh": {
         "bot_title": "Release Vault - 私人机器人",
@@ -584,6 +640,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ 未经授权",
         "expired_req": "⚠️ 请求已过期或已处理。",
         "inspect_error": "❌ 无法解析",
+        "btn_patch_notes": "📝 更新日志",
+        "btn_releases_history": "📚 版本历史",
+        "view_patch_notes_hint": "选择一个版本以查看其完整的更新日志：",
+        "patch_notes_truncated": "因 Telegram 长度限制内容已截断。完整文件保存在磁盘 PATCH_NOTES.md 中",
+        "reply_btn_status": "📊 状态",
+        "reply_btn_menu": "📁 分类",
+        "reply_btn_sync": "🔄 检查更新",
+        "reply_btn_lang": "🌐 语言",
     },
     "ja": {
         "bot_title": "Release Vault - プライベートボット",
@@ -652,6 +716,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ 権限がありません",
         "expired_req": "⚠️ リクエストの期限が切れているか、すでに処理されています。",
         "inspect_error": "❌ 解析できませんでした",
+        "btn_patch_notes": "📝 パッチノート",
+        "btn_releases_history": "📚 リリース履歴",
+        "view_patch_notes_hint": "完全なパッチノートを表示するリリースを選択してください：",
+        "patch_notes_truncated": "Telegramの文字制限のため短縮されました。完全なファイルはディスクの PATCH_NOTES.md にあります",
+        "reply_btn_status": "📊 ステータス",
+        "reply_btn_menu": "📁 カテゴリ",
+        "reply_btn_sync": "🔄 リリース確認",
+        "reply_btn_lang": "🌐 言語",
     },
     "ko": {
         "bot_title": "Release Vault - 전용 봇",
@@ -720,6 +792,14 @@ I18N: Dict[str, Dict[str, str]] = {
         "unauthorized_cb": "⛔ 승인되지 않음",
         "expired_req": "⚠️ 만료되었거나 이미 처리된 요청입니다.",
         "inspect_error": "❌ 분석할 수 없습니다",
+        "btn_patch_notes": "📝 패치 노트",
+        "btn_releases_history": "📚 릴리즈 기록",
+        "view_patch_notes_hint": "전체 패치 노트를 보려면 릴리즈를 선택하세요:",
+        "patch_notes_truncated": "Telegram 길이 제한으로 인해 잘렸습니다. 전체 파일은 디스크의 PATCH_NOTES.md에 있습니다",
+        "reply_btn_status": "📊 상태",
+        "reply_btn_menu": "📁 카테고리",
+        "reply_btn_sync": "🔄 릴리즈 확인",
+        "reply_btn_lang": "🌐 언어",
     },
 }
 
@@ -803,6 +883,39 @@ def format_bytes(b: int) -> str:
     return f"{val:.2f} {units[i]}" if i > 1 else f"{int(val)} {units[i]}"
 
 
+def build_main_reply_keyboard(lang: str) -> Dict[str, Any]:
+    return {
+        "keyboard": [
+            [
+                {"text": tr("reply_btn_status", lang)},
+                {"text": tr("reply_btn_menu", lang)},
+            ],
+            [
+                {"text": tr("reply_btn_sync", lang)},
+                {"text": tr("reply_btn_lang", lang)},
+            ],
+        ],
+        "resize_keyboard": True,
+        "is_persistent": True,
+    }
+
+
+def format_patch_notes(body: str, lang: str, max_chars: int = 3400) -> str:
+    if not body or not body.strip():
+        return f"<i>{tr('no_patch_notes', lang)}</i>"
+    clean_body = body.strip()
+    if len(clean_body) > max_chars:
+        cut_point = clean_body[:max_chars].rfind("\n")
+        if cut_point < max_chars // 2:
+            cut_point = max_chars
+        truncated = clean_body[:cut_point].strip()
+        return (
+            f"{html.escape(truncated)}\n\n"
+            f"<i>[... {tr('patch_notes_truncated', lang)}]</i>"
+        )
+    return html.escape(clean_body)
+
+
 async def tg_call(client: httpx.AsyncClient, method: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/{method}"
     resp = await client.post(url, json=payload, timeout=35.0)
@@ -883,7 +996,7 @@ async def build_dashboard_message(client: httpx.AsyncClient) -> tuple[str, Dict[
 
     cat_buttons = [
         {"text": f"📁 {c}", "callback_data": f"cat:{c[:24]}"}
-        for c in cats[:6]
+        for c in cats[:10]
     ]
     rows: List[List[Dict[str, str]]] = []
     for i in range(0, len(cat_buttons), 2):
@@ -1050,6 +1163,13 @@ async def handle_callback_query(client: httpx.AsyncClient, cb: Dict[str, Any]) -
         set_bot_language(new_lang)
         lang_name = dict(BOT_LANGS).get(new_lang, new_lang)
         await tg_call(client, "answerCallbackQuery", {"callback_query_id": cb_id, "text": f"{tr('lang_changed', new_lang)}{lang_name}"})
+        if chat_id:
+            await send_msg(
+                client,
+                chat_id,
+                f"🌐 {tr('lang_changed', new_lang)}<b>{lang_name}</b>",
+                reply_markup=build_main_reply_keyboard(new_lang),
+            )
         text, markup = await build_dashboard_message(client)
         await edit_msg(client, chat_id, message_id, text, markup)
 
@@ -1123,18 +1243,36 @@ async def handle_callback_query(client: httpx.AsyncClient, cb: Dict[str, Any]) -
             f"📚 {tr('releases_in_archive', lang)}: <b>{len(releases)}</b>\n\n"
         )
         if latest:
-            body_preview = html.escape((latest.get("body") or tr("no_patch_notes", lang))[:500])
+            tag_name = html.escape(latest.get("tag_name") or "v?")
+            rel_name = html.escape(latest.get("name") or "")
+            name_info = f" (<i>{rel_name}</i>)" if rel_name and rel_name != tag_name else ""
             text += (
-                f"🆕 <b>{tr('latest_version', lang)}:</b> <code>{html.escape(latest['tag_name'])}</code>\n"
-                f"📅 {tr('date', lang)}: {html.escape(latest.get('published_at', '')[:10])}\n"
-                f"💾 {tr('size', lang)}: {format_bytes(latest.get('total_size') or 0)}\n\n"
-                f"📝 <b>Patch Notes:</b>\n<pre>{body_preview}</pre>"
+                f"🆕 <b>{tr('latest_version', lang)}:</b> <code>{tag_name}</code>{name_info}\n"
+                f"📅 <b>{tr('date', lang)}:</b> {html.escape(latest.get('published_at', '')[:10])}\n"
+                f"💾 <b>{tr('size', lang)}:</b> {format_bytes(latest.get('total_size') or 0)}\n\n"
+                f"👉 <i>Tocca <b>{tr('btn_patch_notes', lang)}</b> qui sotto per leggere le note di rilascio complete!</i>\n"
             )
 
         pause_label = tr("btn_resume_repo", lang) if is_paused else tr("btn_pause_repo", lang)
         btn_all_repo = ("⬜ 📚 " + tr("btn_mode_all", lang)) if only_latest else ("✅ 📚 " + tr("btn_mode_all", lang))
         btn_lat_repo = ("✅ ⚡ " + tr("btn_mode_latest", lang)) if only_latest else ("⬜ ⚡ " + tr("btn_mode_latest", lang))
-        kb = [
+        
+        kb = []
+        if latest:
+            top_row = [
+                {
+                    "text": f"📝 {tr('btn_patch_notes', lang)} ({latest.get('tag_name') or 'Ultima'})",
+                    "callback_data": f"patchnote:{repo_id}:{latest['id']}",
+                }
+            ]
+            if len(releases) > 1:
+                top_row.append({
+                    "text": f"📚 {tr('btn_releases_history', lang)} ({len(releases)})",
+                    "callback_data": f"repolist:{repo_id}",
+                })
+            kb.append(top_row)
+
+        kb.extend([
             [
                 {"text": btn_all_repo, "callback_data": f"repomode:{repo_id}:0"},
                 {"text": btn_lat_repo, "callback_data": f"repomode:{repo_id}:1"},
@@ -1146,8 +1284,88 @@ async def handle_callback_query(client: httpx.AsyncClient, cb: Dict[str, Any]) -
             [
                 {"text": tr("btn_purge_data", lang), "callback_data": f"repopurge:{repo_id}"},
             ],
-            [{"text": f"{tr('btn_back_cat', lang)} {repo.get('category')}", "callback_data": f"cat:{(repo.get('category') or 'Generale')[:24]}"}],
+            [{"text": f"{tr('btn_back_cat', lang)} {repo.get('category') or 'Generale'}", "callback_data": f"cat:{(repo.get('category') or 'Generale')[:24]}"}],
+        ])
+        await edit_msg(client, chat_id, message_id, text, {"inline_keyboard": kb})
+
+    elif data.startswith("patchnote:"):
+        parts = data.split(":")
+        repo_id = int(parts[1])
+        rel_id = int(parts[2]) if len(parts) > 2 else 0
+
+        rel_resp = await client.get(f"{VAULT_API_BASE}/api/repos/{repo_id}/releases", headers=INTERNAL_HEADERS, timeout=10.0)
+        if rel_resp.status_code != 200:
+            return
+        rdata = rel_resp.json()
+        repo = rdata["repository"]
+        releases = rdata["releases"]
+
+        target_release = None
+        if rel_id:
+            for r in releases:
+                if r["id"] == rel_id:
+                    target_release = r
+                    break
+        if not target_release and releases:
+            target_release = releases[0]
+
+        if not target_release:
+            await edit_msg(
+                client,
+                chat_id,
+                message_id,
+                f"❌ <i>{tr('no_patch_notes', lang)}</i>",
+                {"inline_keyboard": [[{"text": tr("btn_back_repo", lang), "callback_data": f"repo:{repo_id}"}]]},
+            )
+            return
+
+        body = (target_release.get("body") or "").strip()
+        formatted_notes = format_patch_notes(body, lang)
+
+        tag = target_release.get("tag_name") or "v?"
+        name = target_release.get("name") or ""
+        name_extra = f" (<i>{html.escape(name)}</i>)" if name and name != tag else ""
+
+        text = (
+            f"📝 <b>Patch Notes — {html.escape(repo['full_name'])}</b>\n"
+            f"🏷 <b>{tr('latest_version', lang)}:</b> <code>{html.escape(tag)}</code>{name_extra}\n"
+            f"📅 <b>{tr('date', lang)}:</b> {html.escape(target_release.get('published_at', '')[:10])}\n"
+            f"💾 <b>{tr('size', lang)}:</b> {format_bytes(target_release.get('total_size') or 0)}\n\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━\n"
+            f"{formatted_notes}\n"
+            f"━━━━━━━━━━━━━━━━━━━━━━"
+        )
+        nav_row = [{"text": tr("btn_back_repo", lang), "callback_data": f"repo:{repo_id}"}]
+        if len(releases) > 1:
+            nav_row.append({"text": f"📚 {tr('btn_releases_history', lang)} ({len(releases)})", "callback_data": f"repolist:{repo_id}"})
+
+        kb = [
+            nav_row,
+            [{"text": f"{tr('btn_back_cat', lang)} {repo.get('category') or 'Generale'}", "callback_data": f"cat:{(repo.get('category') or 'Generale')[:24]}"}],
         ]
+        await edit_msg(client, chat_id, message_id, text, {"inline_keyboard": kb})
+
+    elif data.startswith("repolist:"):
+        repo_id = int(data.split(":", 1)[1])
+        rel_resp = await client.get(f"{VAULT_API_BASE}/api/repos/{repo_id}/releases", headers=INTERNAL_HEADERS, timeout=10.0)
+        if rel_resp.status_code != 200:
+            return
+        rdata = rel_resp.json()
+        repo = rdata["repository"]
+        releases = rdata["releases"]
+
+        text = (
+            f"📚 <b>{html.escape(repo['full_name'])}</b> — {tr('releases_in_archive', lang)} ({len(releases)})\n\n"
+            f"<i>{tr('view_patch_notes_hint', lang)}</i>"
+        )
+        kb = []
+        for r in releases[:12]:
+            pub_date = (r.get("published_at") or "")[:10]
+            date_str = f" • {pub_date}" if pub_date else ""
+            tag = r.get("tag_name") or "v?"
+            kb.append([{"text": f"📝 {tag}{date_str}", "callback_data": f"patchnote:{repo_id}:{r['id']}"}])
+
+        kb.append([{"text": tr("btn_back_repo", lang), "callback_data": f"repo:{repo_id}"}])
         await edit_msg(client, chat_id, message_id, text, {"inline_keyboard": kb})
 
     elif data.startswith("repomode:"):
@@ -1296,29 +1514,97 @@ async def handle_message(client: httpx.AsyncClient, msg: Dict[str, Any]) -> None
     if not text:
         return
 
-    if text.startswith("/lang") or text.startswith("/language"):
-        picker_text, markup = build_language_picker_view()
-        await send_msg(client, chat_id, picker_text, markup)
-        return
+    t_lower = text.lower()
 
-    if text.startswith("/start") or text.startswith("/menu") or text.startswith("/status") or text.startswith("/repos"):
+    if text.startswith("/start"):
+        # Anchor the permanent Reply Keyboard at the bottom of the chat
+        await send_msg(
+            client,
+            chat_id,
+            f"🛡 <b>{tr('bot_title', lang)}</b>\n<i>{tr('auth_line', lang)}</i>",
+            reply_markup=build_main_reply_keyboard(lang),
+        )
         dash_text, markup = await build_dashboard_message(client)
         await send_msg(client, chat_id, dash_text, markup)
         return
 
-    if text.startswith("/sync"):
-        await client.post(f"{VAULT_API_BASE}/api/sync-all", headers=INTERNAL_HEADERS, timeout=10.0)
-        await send_msg(client, chat_id, tr("check_started_all", lang))
+    # Language selection
+    if (
+        text.startswith("/lang")
+        or text.startswith("🌐")
+        or "lingua" in t_lower
+        or "language" in t_lower
+        or "idioma" in t_lower
+        or "sprache" in t_lower
+        or "langue" in t_lower
+        or "язык" in t_lower
+        or "语言" in t_lower
+        or "言語" in t_lower
+        or "언어" in t_lower
+    ):
+        picker_text, markup = build_language_picker_view()
+        await send_msg(client, chat_id, picker_text, markup)
         return
 
-    # Check if the message contains one or more GitHub links or owner/repo
+    # Sync / Check releases
+    if (
+        text.startswith("/sync")
+        or text.startswith("🔄")
+        or "check" in t_lower
+        or "sincronizz" in t_lower
+        or "vérifier" in t_lower
+        or "verificar" in t_lower
+        or "prüfen" in t_lower
+        or "проверить" in t_lower
+        or "更新" in t_lower
+        or "確認" in t_lower
+        or "확인" in t_lower
+    ):
+        await client.post(f"{VAULT_API_BASE}/api/sync-all", headers=INTERNAL_HEADERS, timeout=10.0)
+        await send_msg(
+            client,
+            chat_id,
+            f"{tr('check_started_all', lang)}\n\n💡 <i>Tocca <b>{tr('reply_btn_status', lang)}</b> per seguire lo stato in tempo reale.</i>",
+            reply_markup=build_main_reply_keyboard(lang),
+        )
+        return
+
+    # Status / Dashboard / Menu / Categories
+    if (
+        text.startswith("/status")
+        or text.startswith("/menu")
+        or text.startswith("/repos")
+        or text.startswith("📊")
+        or text.startswith("📁")
+        or "status" in t_lower
+        or "stato" in t_lower
+        or "statut" in t_lower
+        or "estado" in t_lower
+        or "статус" in t_lower
+        or "状态" in t_lower
+        or "ステータス" in t_lower
+        or "상태" in t_lower
+        or "categor" in t_lower
+        or "menu" in t_lower
+        or "menü" in t_lower
+        or "menú" in t_lower
+        or "категор" in t_lower
+        or "分类" in t_lower
+        or "カテゴリ" in t_lower
+        or "카테고리" in t_lower
+    ):
+        dash_text, markup = await build_dashboard_message(client)
+        await send_msg(client, chat_id, dash_text, markup)
+        return
+
+    # Check if the message contains one or more GitHub / Nexus links or owner/repo
     repos = extract_github_repos_from_text(text)
     if repos:
         for r_slug in repos:
             await handle_github_link_submission(client, chat_id, r_slug)
         return
 
-    # Default help message
+    # Default fallback: show dashboard and keep reply keyboard active
     dash_text, markup = await build_dashboard_message(client)
     await send_msg(client, chat_id, dash_text, markup)
 
