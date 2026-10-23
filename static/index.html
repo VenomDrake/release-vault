@@ -363,17 +363,44 @@
       <div id="view-repos" class="space-y-4">
         <!-- Sub-view A: Grid of Repositories -->
         <div id="repos-grid-section" class="space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-bg-900/70 border border-slate-800/80 p-3.5 rounded-2xl">
-            <div class="relative flex-1">
-              <svg class="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-              </svg>
-              <input type="text" id="repo-search-input" oninput="renderReposGrid()"
-                data-i18n-placeholder="phSearchRepo"
-                placeholder="Cerca per nome repository, descrizione, tag o versione..."
-                class="w-full pl-10 pr-4 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition" />
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-bg-900/70 border border-slate-800/80 p-3 rounded-2xl">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 min-w-0">
+              <!-- Search Input -->
+              <div class="relative flex-1 min-w-[200px]">
+                <svg class="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" id="repo-search-input" oninput="renderReposGrid()"
+                  data-i18n-placeholder="phSearchRepo"
+                  placeholder="Cerca per nome repository, descrizione, tag o versione..."
+                  class="w-full pl-10 pr-4 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500 transition" />
+              </div>
+
+              <!-- Sorting Dropdown -->
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="text-xs text-slate-400 hidden xl:inline" data-i18n="lblSortBy">Ordina per:</span>
+                <div class="relative inline-flex items-center">
+                  <select id="repo-sort-select" onchange="changeRepoSort(this.value)"
+                    class="h-9 pl-8 pr-7 bg-bg-950 border border-slate-800 rounded-xl text-xs font-medium text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer appearance-none transition shadow-sm hover:border-slate-700"
+                    title="Ordinamento repository">
+                    <option value="latest_update" data-i18n="sortLatestUpdate">⚡ Ultimo Aggiornamento</option>
+                    <option value="name_asc" data-i18n="sortNameAsc">🔤 Nome (A → Z)</option>
+                    <option value="name_desc" data-i18n="sortNameDesc">🔤 Nome (Z → A)</option>
+                    <option value="recent_added" data-i18n="sortRecentlyAdded">🕒 Più Recenti Aggiunti</option>
+                    <option value="size_desc" data-i18n="sortSizeDesc">💾 Dimensione Archivio</option>
+                    <option value="releases_count" data-i18n="sortReleasesCount">📦 Numero di Release</option>
+                  </select>
+                  <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
+                  </svg>
+                  <svg class="w-3 h-3 text-slate-400 absolute right-2.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </div>
+              </div>
             </div>
-            <div id="category-pills" class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0"></div>
+
+            <div id="category-pills" class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 shrink-0"></div>
           </div>
 
           <div id="repos-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -1581,6 +1608,31 @@
         return;
       }
 
+      filteredDetached.sort((a, b) => {
+        if (currentRepoSort === 'latest_update') {
+          const dateA = a.latest_published_at || a.created_at || '';
+          const dateB = b.latest_published_at || b.created_at || '';
+          return dateB.localeCompare(dateA);
+        } else if (currentRepoSort === 'name_asc') {
+          const nameA = (a.name || a.full_name || '').toLowerCase();
+          const nameB = (b.name || b.full_name || '').toLowerCase();
+          return nameA.localeCompare(nameB, undefined, { numeric: true });
+        } else if (currentRepoSort === 'name_desc') {
+          const nameA = (a.name || a.full_name || '').toLowerCase();
+          const nameB = (b.name || b.full_name || '').toLowerCase();
+          return nameB.localeCompare(nameA, undefined, { numeric: true });
+        } else if (currentRepoSort === 'recent_added') {
+          const dateA = a.created_at || '';
+          const dateB = b.created_at || '';
+          return dateB.localeCompare(dateA);
+        } else if (currentRepoSort === 'size_desc') {
+          return (b.repo_total_size || 0) - (a.repo_total_size || 0);
+        } else if (currentRepoSort === 'releases_count') {
+          return (b.releases_count || 0) - (a.releases_count || 0);
+        }
+        return 0;
+      });
+
       section.classList.remove('hidden');
       if (badge) badge.textContent = filteredDetached.length;
 
@@ -1593,6 +1645,9 @@
         const tagsHtml = (r.tags || '').split(',').map(t => t.trim()).filter(Boolean).map(t =>
           `<span class="text-[10px] px-2 py-0.5 rounded-md bg-bg-950 border border-slate-800 text-slate-400">#${escapeHtml(t)}</span>`
         ).join('');
+
+        const dateToShow = r.latest_published_at || r.created_at;
+        const formattedDate = dateToShow ? formatDate(dateToShow) : '';
 
         return `
           <div onclick="openDetachedArchiveDetail('${escapeHtml(r.folder_name)}')"
@@ -1619,19 +1674,28 @@
               </div>
             </div>
 
-            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <div class="flex items-center gap-3">
-                <div>
-                  <span class="text-slate-500">${tr('lblVersions')}:</span>
-                  <span class="font-semibold text-white ml-1">${r.releases_count || 0}</span>
+            <div class="pt-3.5 mt-3.5 border-t border-slate-800/80 space-y-2 text-xs">
+              <div class="flex items-center justify-between text-[11px] text-slate-400">
+                <div class="flex items-center gap-1.5 truncate">
+                  <span class="text-slate-500">🕒</span>
+                  <span class="truncate">${tr('lblUpdated')}: <span class="text-slate-300 font-medium">${formattedDate || '--'}</span></span>
                 </div>
-                <div>
-                  <span class="text-slate-500">${tr('lblSpace')}:</span>
-                  <span class="font-mono text-slate-300 ml-1">${formatBytes(r.repo_total_size)}</span>
+                <div class="font-mono text-[11px] px-2 py-0.5 rounded bg-bg-950 border border-slate-800 text-amber-300 truncate max-w-[130px]" title="${escapeHtml(r.latest_tag || '')}">
+                  ${escapeHtml(r.latest_tag || '')}
                 </div>
               </div>
-              <div class="font-mono text-xs px-2 py-0.5 rounded bg-bg-950 border border-slate-800 text-amber-300 truncate max-w-[120px]">
-                ${escapeHtml(r.latest_tag || '')}
+
+              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-800/40">
+                <div class="flex items-center gap-3">
+                  <div>
+                    <span class="text-slate-500">${tr('lblVersions')}:</span>
+                    <span class="font-semibold text-white ml-1">${r.releases_count || 0}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-500">${tr('lblSpace')}:</span>
+                    <span class="font-mono text-slate-300 ml-1">${formatBytes(r.repo_total_size)}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1639,8 +1703,21 @@
       }).join('');
     }
 
+    let currentRepoSort = localStorage.getItem('vault_repo_sort') || 'latest_update';
+
+    function changeRepoSort(newSort) {
+      currentRepoSort = newSort;
+      localStorage.setItem('vault_repo_sort', newSort);
+      renderReposGrid();
+    }
+
     function renderReposGrid() {
       const grid = document.getElementById('repos-grid');
+      const sortSelect = document.getElementById('repo-sort-select');
+      if (sortSelect && sortSelect.value !== currentRepoSort) {
+        sortSelect.value = currentRepoSort;
+      }
+
       if (selectedCategory === '__DETACHED__') {
         grid.innerHTML = '';
         renderDetachedArchivesGrid();
@@ -1658,6 +1735,31 @@
           (r.category || '').toLowerCase().includes(q) ||
           (r.latest_tag || '').toLowerCase().includes(q)
         );
+      });
+
+      filtered.sort((a, b) => {
+        if (currentRepoSort === 'latest_update') {
+          const dateA = a.latest_published_at || a.created_at || '';
+          const dateB = b.latest_published_at || b.created_at || '';
+          return dateB.localeCompare(dateA);
+        } else if (currentRepoSort === 'name_asc') {
+          const nameA = (a.name || a.full_name || '').toLowerCase();
+          const nameB = (b.name || b.full_name || '').toLowerCase();
+          return nameA.localeCompare(nameB, undefined, { numeric: true });
+        } else if (currentRepoSort === 'name_desc') {
+          const nameA = (a.name || a.full_name || '').toLowerCase();
+          const nameB = (b.name || b.full_name || '').toLowerCase();
+          return nameB.localeCompare(nameA, undefined, { numeric: true });
+        } else if (currentRepoSort === 'recent_added') {
+          const dateA = a.created_at || '';
+          const dateB = b.created_at || '';
+          return dateB.localeCompare(dateA);
+        } else if (currentRepoSort === 'size_desc') {
+          return (b.repo_total_size || 0) - (a.repo_total_size || 0);
+        } else if (currentRepoSort === 'releases_count') {
+          return (b.releases_count || 0) - (a.releases_count || 0);
+        }
+        return 0;
       });
 
       if (filtered.length === 0) {
@@ -1715,6 +1817,9 @@
           `<span class="text-[10px] px-2 py-0.5 rounded-md bg-bg-950 border border-slate-800 text-slate-400">#${escapeHtml(t)}</span>`
         ).join('');
 
+        const dateToShow = r.latest_published_at || r.created_at;
+        const formattedDate = dateToShow ? formatDate(dateToShow) : '';
+
         return `
           <div onclick="openRepoDetail(${r.id})"
             class="group bg-bg-900 hover:bg-bg-800/90 border ${isPaused ? 'border-amber-500/30' : 'border-slate-800/80'} hover:border-indigo-500/50 rounded-2xl p-5 cursor-pointer transition-all flex flex-col justify-between shadow-lg">
@@ -1747,19 +1852,28 @@
               </div>
             </div>
 
-            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <div class="flex items-center gap-3">
-                <div>
-                  <span class="text-slate-500">${tr('lblVersions')}:</span>
-                  <span class="font-semibold text-white ml-1">${r.completed_releases_count || 0}/${r.releases_count || 0}</span>
+            <div class="pt-3.5 mt-3.5 border-t border-slate-800/80 space-y-2 text-xs">
+              <div class="flex items-center justify-between text-[11px] text-slate-400">
+                <div class="flex items-center gap-1.5 truncate">
+                  <span class="text-slate-500">🕒</span>
+                  <span class="truncate">${tr('lblUpdated')}: <span class="text-slate-300 font-medium">${formattedDate || '--'}</span></span>
                 </div>
-                <div>
-                  <span class="text-slate-500">${tr('lblSpace')}:</span>
-                  <span class="font-mono text-slate-300 ml-1">${formatBytes(r.repo_total_size)}</span>
+                <div class="font-mono text-[11px] px-2 py-0.5 rounded bg-bg-950 border border-slate-800 text-indigo-300 truncate max-w-[130px]" title="${escapeHtml(r.latest_tag || '')}">
+                  ${escapeHtml(r.latest_tag || '...')}
                 </div>
               </div>
-              <div class="font-mono text-xs px-2 py-0.5 rounded bg-bg-950 border border-slate-800 text-indigo-300 truncate max-w-[120px]">
-                ${escapeHtml(r.latest_tag || '...')}
+
+              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-800/40">
+                <div class="flex items-center gap-3">
+                  <div>
+                    <span class="text-slate-500">${tr('lblVersions')}:</span>
+                    <span class="font-semibold text-white ml-1">${r.completed_releases_count || 0}/${r.releases_count || 0}</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-500">${tr('lblSpace')}:</span>
+                    <span class="font-mono text-slate-300 ml-1">${formatBytes(r.repo_total_size)}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2840,7 +2954,10 @@
         sshIpLabel: 'Indirizzo IP Host / Container', sshPortLabel: 'Porta SSH',
         sshCmdLabel: 'Comando di connessione diretta (Terminale):', sshConfigTitle: 'Configurazione Porta e Credenziali Root',
         lblSshPort: 'Porta SSH (Default: 22)', lblSshRootPass: 'Nuova Password Root', lblSshAddKey: 'Aggiungi Chiave SSH Pubblica',
-        btnApply: 'Applica', btnAdd: 'Aggiungi', btnCopy: 'Copia', sshCopied: 'Comando SSH copiato negli appunti!'
+        btnApply: 'Applica', btnAdd: 'Aggiungi', btnCopy: 'Copia', sshCopied: 'Comando SSH copiato negli appunti!',
+        lblSortBy: 'Ordina per:', sortLatestUpdate: '⚡ Ultimo Aggiornamento', sortNameAsc: '🔤 Nome (A → Z)', sortNameDesc: '🔤 Nome (Z → A)',
+        sortRecentlyAdded: '🕒 Più Recenti Aggiunti', sortSizeDesc: '💾 Dimensione Archivio', sortReleasesCount: '📦 Numero di Release',
+        lblUpdated: 'Aggiornato'
       },
       en: {
         loginSub: 'Private Release Archiver & Patch Notes', lblUsername: 'Username', lblPassword: 'Password', btnLogin: 'Sign In to Vault',
@@ -2927,7 +3044,10 @@
         sshIpLabel: 'Host / Container IP Address', sshPortLabel: 'SSH Port',
         sshCmdLabel: 'Direct connection command (Terminal):', sshConfigTitle: 'SSH Port & Root Credentials Configuration',
         lblSshPort: 'SSH Port (Default: 22)', lblSshRootPass: 'New Root Password', lblSshAddKey: 'Add Public SSH Key',
-        btnApply: 'Apply', btnAdd: 'Add', btnCopy: 'Copy', sshCopied: 'SSH command copied to clipboard!'
+        btnApply: 'Apply', btnAdd: 'Add', btnCopy: 'Copy', sshCopied: 'SSH command copied to clipboard!',
+        lblSortBy: 'Sort by:', sortLatestUpdate: '⚡ Latest Update', sortNameAsc: '🔤 Name (A → Z)', sortNameDesc: '🔤 Name (Z → A)',
+        sortRecentlyAdded: '🕒 Recently Added', sortSizeDesc: '💾 Archive Size', sortReleasesCount: '📦 Releases Count',
+        lblUpdated: 'Updated'
       },
       es: {
         loginSub: 'Archivo Privado de Versiones y Notas', lblUsername: 'Usuario', lblPassword: 'Contraseña', btnLogin: 'Entrar al Vault',
@@ -2969,7 +3089,10 @@
         sshIpLabel: 'Dirección IP Host / Contenedor', sshPortLabel: 'Puerto SSH',
         sshCmdLabel: 'Comando de conexión directa (Terminal):', sshConfigTitle: 'Configuración de Puerto y Credenciales Root',
         lblSshPort: 'Puerto SSH (Por defecto: 22)', lblSshRootPass: 'Nueva Contraseña Root', lblSshAddKey: 'Añadir Clave SSH Pública',
-        btnApply: 'Aplicar', btnAdd: 'Añadir', btnCopy: 'Copiar', sshCopied: '¡Comando SSH copiado al portapapeles!'
+        btnApply: 'Aplicar', btnAdd: 'Añadir', btnCopy: 'Copiar', sshCopied: '¡Comando SSH copiado al portapapeles!',
+        lblSortBy: 'Ordenar por:', sortLatestUpdate: '⚡ Última Actualización', sortNameAsc: '🔤 Nombre (A → Z)', sortNameDesc: '🔤 Nombre (Z → A)',
+        sortRecentlyAdded: '🕒 Recientemente Añadidos', sortSizeDesc: '💾 Tamaño de Archivo', sortReleasesCount: '📦 Cantidad de Versiones',
+        lblUpdated: 'Actualizado'
       },
       fr: {
         loginSub: 'Archive Privée & Notes de Version', lblUsername: 'Nom d\'utilisateur', lblPassword: 'Mot de passe', btnLogin: 'Connexion au Vault',
@@ -3010,7 +3133,10 @@
         sshIpLabel: 'Adresse IP Hôte / Conteneur', sshPortLabel: 'Port SSH',
         sshCmdLabel: 'Commande de connexion directe (Terminal) :', sshConfigTitle: 'Configuration du Port et Identifiants Root',
         lblSshPort: 'Port SSH (Défaut : 22)', lblSshRootPass: 'Nouveau Mot de Passe Root', lblSshAddKey: 'Ajouter Clé SSH Publique',
-        btnApply: 'Appliquer', btnAdd: 'Ajouter', btnCopy: 'Copier', sshCopied: 'Commande SSH copiée dans le presse-papiers !'
+        btnApply: 'Appliquer', btnAdd: 'Ajouter', btnCopy: 'Copier', sshCopied: 'Commande SSH copiée dans le presse-papiers !',
+        lblSortBy: 'Trier par :', sortLatestUpdate: '⚡ Dernière Mise à Jour', sortNameAsc: '🔤 Nom (A → Z)', sortNameDesc: '🔤 Nom (Z → A)',
+        sortRecentlyAdded: '🕒 Récemment Ajoutés', sortSizeDesc: '💾 Taille de l\'Archive', sortReleasesCount: '📦 Nombre de Versions',
+        lblUpdated: 'Mis à jour'
       },
       de: {
         loginSub: 'Privates Release-Archiv & Patchnotes', lblUsername: 'Benutzername', lblPassword: 'Passwort', btnLogin: 'Im Vault anmelden',
@@ -3051,7 +3177,10 @@
         sshIpLabel: 'Host- / Container-IP-Adresse', sshPortLabel: 'SSH-Port',
         sshCmdLabel: 'Direkter Verbindungsbefehl (Terminal):', sshConfigTitle: 'SSH-Port- & Root-Zugangsdaten-Konfiguration',
         lblSshPort: 'SSH-Port (Standard: 22)', lblSshRootPass: 'Neues Root-Passwort', lblSshAddKey: 'Öffentlichen SSH-Schlüssel hinzufügen',
-        btnApply: 'Übernehmen', btnAdd: 'Hinzufügen', btnCopy: 'Kopieren', sshCopied: 'SSH-Befehl in Zwischenablage kopiert!'
+        btnApply: 'Übernehmen', btnAdd: 'Hinzufügen', btnCopy: 'Kopieren', sshCopied: 'SSH-Befehl in Zwischenablage kopiert!',
+        lblSortBy: 'Sortieren nach:', sortLatestUpdate: '⚡ Letztes Update', sortNameAsc: '🔤 Name (A → Z)', sortNameDesc: '🔤 Name (Z → A)',
+        sortRecentlyAdded: '🕒 Kürzlich Hinzugefügt', sortSizeDesc: '💾 Archivgröße', sortReleasesCount: '📦 Anzahl der Releases',
+        lblUpdated: 'Aktualisiert'
       },
       pt: {
         loginSub: 'Arquivo Privado de Releases e Notas', lblUsername: 'Usuário', lblPassword: 'Senha', btnLogin: 'Entrar no Vault',
@@ -3092,7 +3221,10 @@
         sshIpLabel: 'Endereço IP Host / Contêiner', sshPortLabel: 'Porta SSH',
         sshCmdLabel: 'Comando de conexão direta (Terminal):', sshConfigTitle: 'Configuração de Porta e Credenciais Root',
         lblSshPort: 'Porta SSH (Padrão: 22)', lblSshRootPass: 'Nova Senha Root', lblSshAddKey: 'Adicionar Chave SSH Pública',
-        btnApply: 'Aplicar', btnAdd: 'Adicionar', btnCopy: 'Copiar', sshCopied: 'Comando SSH copiado para a área de transferência!'
+        btnApply: 'Aplicar', btnAdd: 'Adicionar', btnCopy: 'Copiar', sshCopied: 'Comando SSH copiado para a área de transferência!',
+        lblSortBy: 'Ordenar por:', sortLatestUpdate: '⚡ Última Atualização', sortNameAsc: '🔤 Nome (A → Z)', sortNameDesc: '🔤 Nome (Z → A)',
+        sortRecentlyAdded: '🕒 Recém Adicionados', sortSizeDesc: '💾 Tamanho do Arquivo', sortReleasesCount: '📦 Quantidade de Releases',
+        lblUpdated: 'Atualizado'
       },
       ru: {
         loginSub: 'Приватный Архив Релизов и Патчноутов', lblUsername: 'Имя пользователя', lblPassword: 'Пароль', btnLogin: 'Войти в Vault',
@@ -3133,7 +3265,10 @@
         sshIpLabel: 'IP-адрес хоста / контейнера', sshPortLabel: 'SSH порт',
         sshCmdLabel: 'Команда прямого подключения (терминал):', sshConfigTitle: 'Настройка порта и пароля root',
         lblSshPort: 'SSH порт (по умолчанию: 22)', lblSshRootPass: 'Новый пароль root', lblSshAddKey: 'Добавить публичный SSH ключ',
-        btnApply: 'Применить', btnAdd: 'Добавить', btnCopy: 'Копировать', sshCopied: 'Команда SSH скопирована в буфер обмена!'
+        btnApply: 'Применить', btnAdd: 'Добавить', btnCopy: 'Копировать', sshCopied: 'Команда SSH скопирована в буфер обмена!',
+        lblSortBy: 'Сортировка:', sortLatestUpdate: '⚡ Последнее Обновление', sortNameAsc: '🔤 По имени (А → Я)', sortNameDesc: '🔤 По имени (Я → А)',
+        sortRecentlyAdded: '🕒 Недавно Добавленные', sortSizeDesc: '💾 Размер Архива', sortReleasesCount: '📦 Количество Релизов',
+        lblUpdated: 'Обновлено'
       },
       zh: {
         loginSub: '私有版本归档与更新日志系统', lblUsername: '用户名', lblPassword: '密码', btnLogin: '登录 Vault',
@@ -3174,7 +3309,10 @@
         sshIpLabel: '主机 / 容器 IP 地址', sshPortLabel: 'SSH 端口',
         sshCmdLabel: '直接连接命令（终端）：', sshConfigTitle: 'SSH 端口与 Root 凭据配置',
         lblSshPort: 'SSH 端口（默认：22）', lblSshRootPass: '新 Root 密码', lblSshAddKey: '添加公钥 SSH',
-        btnApply: '应用', btnAdd: '添加', btnCopy: '复制', sshCopied: 'SSH 连接命令已复制到剪贴板！'
+        btnApply: '应用', btnAdd: '添加', btnCopy: '复制', sshCopied: 'SSH 连接命令已复制到剪贴板！',
+        lblSortBy: '排序方式：', sortLatestUpdate: '⚡ 最近更新', sortNameAsc: '🔤 名称 (A → Z)', sortNameDesc: '🔤 名称 (Z → A)',
+        sortRecentlyAdded: '🕒 最近添加', sortSizeDesc: '💾 归档大小', sortReleasesCount: '📦 Release 数量',
+        lblUpdated: '更新于'
       },
       ja: {
         loginSub: 'プライベートリリース保管庫 & パッチノート', lblUsername: 'ユーザー名', lblPassword: 'パスワード', btnLogin: 'Vault にログイン',
@@ -3215,7 +3353,10 @@
         sshIpLabel: 'ホスト / コンテナ IP アドレス', sshPortLabel: 'SSH ポート',
         sshCmdLabel: 'ダイレクト接続コマンド（端末）：', sshConfigTitle: 'SSH ポートおよび Root 認証情報設定',
         lblSshPort: 'SSH ポート（初期値：22）', lblSshRootPass: '新しい Root パスワード', lblSshAddKey: '公開 SSH キーの追加',
-        btnApply: '適用', btnAdd: '追加', btnCopy: 'コピー', sshCopied: 'SSH 接続コマンドをクリップボードにコピーしました！'
+        btnApply: '適用', btnAdd: '追加', btnCopy: 'コピー', sshCopied: 'SSH 接続コマンドをクリップボードにコピーしました！',
+        lblSortBy: '並び替え：', sortLatestUpdate: '⚡ 最新の更新', sortNameAsc: '🔤 名前 (A → Z)', sortNameDesc: '🔤 名前 (Z → A)',
+        sortRecentlyAdded: '🕒 最近追加', sortSizeDesc: '💾 アーカイブ容量', sortReleasesCount: '📦 リリース数',
+        lblUpdated: '更新日'
       },
       ko: {
         loginSub: '프라이빗 릴리스 아카이브 & 패치노트', lblUsername: '사용자 이름', lblPassword: '비밀번호', btnLogin: 'Vault 로그인',
@@ -3256,7 +3397,10 @@
         sshIpLabel: '호스트 / 컨테이너 IP 주소', sshPortLabel: 'SSH 포트',
         sshCmdLabel: '직접 접속 명령어 (터미널):', sshConfigTitle: 'SSH 포트 및 Root 비밀번호 설정',
         lblSshPort: 'SSH 포트 (기본값: 22)', lblSshRootPass: '새 Root 비밀번호', lblSshAddKey: '공개 SSH 키 추가',
-        btnApply: '적용', btnAdd: '추가', btnCopy: '복사', sshCopied: 'SSH 명령어가 클립보드에 복사되었습니다!'
+        btnApply: '적용', btnAdd: '추가', btnCopy: '복사', sshCopied: 'SSH 명령어가 클립보드에 복사되었습니다!',
+        lblSortBy: '정렬 기준:', sortLatestUpdate: '⚡ 최근 업데이트', sortNameAsc: '🔤 이름순 (A → Z)', sortNameDesc: '🔤 이름순 (Z → A)',
+        sortRecentlyAdded: '🕒 최근 추가됨', sortSizeDesc: '💾 아카이브 크기', sortReleasesCount: '📦 릴리스 수',
+        lblUpdated: '업데이트'
       }
     };
 
@@ -3289,6 +3433,8 @@
       });
 
       updateGlobalPauseUI(globalPaused);
+      const sortSelect = document.getElementById('repo-sort-select');
+      if (sortSelect) sortSelect.value = currentRepoSort;
       if (reposList && reposList.length > 0) {
         renderCategoryPills();
         renderReposGrid();
