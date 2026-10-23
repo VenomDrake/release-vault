@@ -230,6 +230,15 @@
             <span data-i18n="btnDonate" class="hidden xl:inline">Supporta / Dona</span>
           </a>
 
+          <!-- Top Bar SSH Badge / Quick Settings Jump -->
+          <button onclick="quickToggleSshFromHeader()" id="header-ssh-btn"
+            class="h-9 px-2.5 sm:px-3 rounded-xl border text-xs font-medium transition inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 bg-slate-800/80 border-slate-700/80 text-slate-400 hover:text-white"
+            title="Stato Connessione SSH (Clicca per gestire)">
+            <span id="header-ssh-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+            <span class="font-mono font-semibold">SSH</span>
+            <span id="header-ssh-info" class="hidden md:inline font-mono text-[11px] text-slate-400">OFF</span>
+          </button>
+
           <button onclick="openSetupWizard(false)" id="btn-open-guide"
             class="h-9 px-3 rounded-xl bg-slate-800/80 hover:bg-indigo-500/20 border border-slate-700/80 hover:border-indigo-500/40 text-xs font-medium text-indigo-300 transition inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
             title="Guida & Setup Wizard">
@@ -640,6 +649,114 @@
               <input type="password" id="set-new-password"
                 class="w-full px-3.5 py-2 bg-bg-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500" />
             </div>
+          </div>
+        </div>
+
+        <!-- SSH Server & Remote Access -->
+        <div class="bg-bg-900 border border-slate-800/80 rounded-2xl p-6 space-y-4" id="section-ssh-settings">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🔐</span>
+                <h3 data-i18n="setSshTitle" class="text-base font-semibold text-white">Accesso SSH Remoto</h3>
+                <span id="ssh-status-pill" class="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                  DISATTIVATO
+                </span>
+              </div>
+              <p data-i18n="setSshSub" class="text-xs text-slate-400 mt-1">
+                Attiva o disattiva il server OpenSSH per accedere al container tramite terminale.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btn-toggle-ssh" onclick="toggleSshService()"
+                class="px-4 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20">
+                <span id="ssh-btn-icon">▶️</span>
+                <span id="ssh-btn-text" data-i18n="btnSshEnable">Attiva Server SSH</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Active details card (shown when SSH is active) -->
+          <div id="ssh-active-card" class="hidden p-4 rounded-xl bg-bg-950 border border-emerald-500/30 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="font-medium text-emerald-300" data-i18n="sshActiveNotice">Server SSH attivo e in ascolto</span>
+              </div>
+              <div class="text-slate-400 font-mono text-[11px]">
+                Utente: <span class="text-white font-semibold">root</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="p-3 bg-bg-900 border border-slate-800 rounded-lg">
+                <div class="text-slate-400 text-[11px] mb-1" data-i18n="sshIpLabel">Indirizzo IP Host / Container</div>
+                <div id="ssh-ip-display" class="font-mono text-sm font-semibold text-indigo-300">--</div>
+              </div>
+              <div class="p-3 bg-bg-900 border border-slate-800 rounded-lg">
+                <div class="text-slate-400 text-[11px] mb-1" data-i18n="sshPortLabel">Porta SSH</div>
+                <div id="ssh-port-display" class="font-mono text-sm font-semibold text-indigo-300">22</div>
+              </div>
+            </div>
+
+            <div>
+              <div class="text-slate-400 text-[11px] mb-1.5" data-i18n="sshCmdLabel">Comando di connessione diretta (Terminale):</div>
+              <div class="flex items-center gap-2 bg-bg-900 border border-slate-800 rounded-xl p-2 font-mono text-xs">
+                <code id="ssh-command-display" class="flex-1 text-emerald-400 select-all overflow-x-auto whitespace-nowrap">ssh root@...</code>
+                <button type="button" onclick="copySshCommand()"
+                  class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition inline-flex items-center gap-1 shrink-0"
+                  title="Copia comando">
+                  <span id="ssh-copy-icon">📋</span>
+                  <span id="ssh-copy-text" data-i18n="btnCopy">Copia</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inactive notice card (shown when SSH is disabled) -->
+          <div id="ssh-inactive-card" class="p-4 rounded-xl bg-bg-950 border border-slate-800 text-xs text-slate-400 space-y-1">
+            <div class="flex items-center gap-2 font-medium text-slate-300">
+              <span>⚪️</span>
+              <span data-i18n="sshDisabledNotice">Server SSH attualmente disattivato.</span>
+            </div>
+            <p data-i18n="sshDisabledDesc" class="text-[11px] text-slate-500">
+              Nessuna porta è esposta e le connessioni remote da terminale sono bloccate. Clicca su "Attiva Server SSH" per aprire la connessione sicura.
+            </p>
+          </div>
+
+          <!-- SSH Quick Config (Port, Root Password, Key) -->
+          <div class="pt-2 border-t border-slate-800/70 space-y-3">
+            <div class="text-xs font-semibold text-white" data-i18n="sshConfigTitle">Configurazione Porta e Credenziali Root</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label data-i18n="lblSshPort" class="block text-xs font-medium text-slate-300 mb-1">Porta SSH (Default: 22)</label>
+                <div class="flex gap-2">
+                  <input type="number" id="set-ssh-port" placeholder="22" min="1" max="65535"
+                    class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-indigo-500" />
+                  <button type="button" onclick="saveSshPortOnly()"
+                    class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-xl transition shrink-0" data-i18n="btnApply">Applica</button>
+                </div>
+              </div>
+              <div>
+                <label data-i18n="lblSshRootPass" class="block text-xs font-medium text-slate-300 mb-1">Nuova Password Root</label>
+                <div class="flex gap-2">
+                  <input type="password" id="set-ssh-root-password" placeholder="Nuova password root..."
+                    class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500" />
+                  <button type="button" onclick="saveSshPasswordOnly()"
+                    class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-xl transition shrink-0" data-i18n="btnApply">Imposta</button>
+                </div>
+              </div>
+              <div>
+                <label data-i18n="lblSshAddKey" class="block text-xs font-medium text-slate-300 mb-1">Aggiungi Chiave SSH Pubblica</label>
+                <div class="flex gap-2">
+                  <input type="text" id="set-ssh-auth-key" placeholder="ssh-ed25519 AAAAC3... o ssh-rsa"
+                    class="w-full px-3 py-2 bg-bg-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-indigo-500" />
+                  <button type="button" onclick="saveSshKeyOnly()"
+                    class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded-xl transition shrink-0" data-i18n="btnAdd">Aggiungi</button>
+                </div>
+              </div>
+            </div>
+            <div id="ssh-keys-badge" class="text-[11px] text-slate-400 font-mono"></div>
           </div>
         </div>
 
@@ -1328,6 +1445,7 @@
     async function refreshOverview() {
       const data = await apiFetch('/api/overview');
       updateGlobalPauseUI(data.global_paused);
+      if (data.ssh) updateSshUI(data.ssh);
       document.getElementById('stat-repos').textContent = data.repositories_count;
       document.getElementById('stat-releases').textContent = `${data.completed_releases} / ${data.total_releases}`;
       document.getElementById('stat-assets').textContent = `${data.completed_assets} ${tr('filesDownloaded')}`;
@@ -2394,6 +2512,7 @@
         document.getElementById('rate-limit-badge').textContent =
           `GitHub API: ${s.rate_limit.remaining} / ${s.rate_limit.limit} richieste disponibili`;
       }
+      await loadSshStatus();
     }
 
     async function saveSettings() {
@@ -2433,6 +2552,201 @@
         showToast('Notifica di test inviata ai canali configurati!', 'success');
       } catch (err) {
         showToast(err.message, 'error');
+      }
+    }
+
+    // --- SSH SERVER MANAGEMENT ---
+    let latestSshState = { active: false, ip: '', port: 22, command: '', has_keys: false, key_count: 0 };
+
+    function updateSshUI(ssh) {
+      if (!ssh) return;
+      latestSshState = ssh;
+
+      // Header Button
+      const headerBtn = document.getElementById('header-ssh-btn');
+      const headerDot = document.getElementById('header-ssh-dot');
+      const headerInfo = document.getElementById('header-ssh-info');
+      if (headerBtn && headerDot && headerInfo) {
+        if (ssh.active) {
+          headerBtn.className = "h-9 px-2.5 sm:px-3 rounded-xl border text-xs font-medium transition inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300";
+          headerDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+          headerInfo.className = "hidden md:inline font-mono text-[11px] text-emerald-400 font-semibold";
+          headerInfo.textContent = `${ssh.ip}:${ssh.port}`;
+        } else {
+          headerBtn.className = "h-9 px-2.5 sm:px-3 rounded-xl border text-xs font-medium transition inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 bg-slate-800/80 border-slate-700/80 text-slate-400 hover:text-white";
+          headerDot.className = "w-2 h-2 rounded-full bg-slate-500";
+          headerInfo.className = "hidden md:inline font-mono text-[11px] text-slate-400";
+          headerInfo.textContent = "OFF";
+        }
+      }
+
+      // Settings Tab Card
+      const pill = document.getElementById('ssh-status-pill');
+      const toggleBtn = document.getElementById('btn-toggle-ssh');
+      const toggleIcon = document.getElementById('ssh-btn-icon');
+      const toggleText = document.getElementById('ssh-btn-text');
+      const activeCard = document.getElementById('ssh-active-card');
+      const inactiveCard = document.getElementById('ssh-inactive-card');
+      const ipDisp = document.getElementById('ssh-ip-display');
+      const portDisp = document.getElementById('ssh-port-display');
+      const cmdDisp = document.getElementById('ssh-command-display');
+      const portInput = document.getElementById('set-ssh-port');
+      const keysBadge = document.getElementById('ssh-keys-badge');
+
+      if (pill) {
+        if (ssh.active) {
+          pill.className = "text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300";
+          pill.textContent = `ATTIVO (${ssh.ip}:${ssh.port})`;
+        } else {
+          pill.className = "text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700";
+          pill.textContent = "DISATTIVATO";
+        }
+      }
+
+      if (toggleBtn && toggleIcon && toggleText) {
+        if (ssh.active) {
+          toggleBtn.className = "px-4 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/20";
+          toggleIcon.textContent = "⏹";
+          toggleText.textContent = tr("btnSshDisable");
+        } else {
+          toggleBtn.className = "px-4 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20";
+          toggleIcon.textContent = "▶️";
+          toggleText.textContent = tr("btnSshEnable");
+        }
+      }
+
+      if (activeCard && inactiveCard) {
+        if (ssh.active) {
+          activeCard.classList.remove('hidden');
+          inactiveCard.classList.add('hidden');
+        } else {
+          activeCard.classList.add('hidden');
+          inactiveCard.classList.remove('hidden');
+        }
+      }
+
+      if (ipDisp) ipDisp.textContent = ssh.ip || '--';
+      if (portDisp) portDisp.textContent = ssh.port || 22;
+      if (cmdDisp) cmdDisp.textContent = ssh.command || `ssh root@${ssh.ip || '127.0.0.1'}`;
+      if (portInput && !portInput.matches(':focus')) {
+        portInput.value = ssh.port || 22;
+      }
+
+      if (keysBadge) {
+        if (ssh.has_keys) {
+          keysBadge.textContent = `🔑 ${ssh.key_count} chiave/i pubblica/e autorizzata/e in /root/.ssh/authorized_keys`;
+        } else {
+          keysBadge.textContent = `Nessuna chiave pubblica in authorized_keys (autenticazione con password abilitata)`;
+        }
+      }
+    }
+
+    async function loadSshStatus() {
+      try {
+        const ssh = await apiFetch('/api/ssh/status');
+        updateSshUI(ssh);
+      } catch (err) {
+        console.error("loadSshStatus error:", err);
+      }
+    }
+
+    async function toggleSshService() {
+      const willEnable = !latestSshState.active;
+      const toggleBtn = document.getElementById('btn-toggle-ssh');
+      if (toggleBtn) toggleBtn.disabled = true;
+      try {
+        showToast(willEnable ? "Avvio server SSH in corso..." : "Arresto server SSH in corso...", "info");
+        const res = await apiFetch('/api/ssh/toggle', {
+          method: 'POST',
+          body: JSON.stringify({ enable: willEnable })
+        });
+        updateSshUI(res);
+        showToast(willEnable ? `✅ Server SSH ATTIVO su ${res.ip}:${res.port}` : "Server SSH disattivato con successo", "success");
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        if (toggleBtn) toggleBtn.disabled = false;
+      }
+    }
+
+    function quickToggleSshFromHeader() {
+      switchTab('settings');
+      setTimeout(() => {
+        const el = document.getElementById('section-ssh-settings');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+
+    async function saveSshPortOnly() {
+      const p = parseInt(document.getElementById('set-ssh-port').value, 10);
+      if (!p || p < 1 || p > 65535) {
+        showToast("Inserisci un numero di porta valido tra 1 e 65535", "error");
+        return;
+      }
+      try {
+        const res = await apiFetch('/api/ssh/configure', {
+          method: 'POST',
+          body: JSON.stringify({ port: p })
+        });
+        updateSshUI(res);
+        showToast(`Porta SSH impostata a ${p}`, "success");
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function saveSshPasswordOnly() {
+      const pw = document.getElementById('set-ssh-root-password').value;
+      if (!pw || !pw.trim()) {
+        showToast("Inserisci una password per l'utente root", "error");
+        return;
+      }
+      try {
+        await apiFetch('/api/ssh/configure', {
+          method: 'POST',
+          body: JSON.stringify({ root_password: pw })
+        });
+        document.getElementById('set-ssh-root-password').value = '';
+        showToast("Password utente root aggiornata con successo!", "success");
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function saveSshKeyOnly() {
+      const key = document.getElementById('set-ssh-auth-key').value;
+      if (!key || !key.trim()) {
+        showToast("Incolla una chiave SSH pubblica valida", "error");
+        return;
+      }
+      try {
+        const res = await apiFetch('/api/ssh/configure', {
+          method: 'POST',
+          body: JSON.stringify({ authorized_key: key })
+        });
+        document.getElementById('set-ssh-auth-key').value = '';
+        updateSshUI(res);
+        showToast("Chiave pubblica SSH aggiunta!", "success");
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function copySshCommand() {
+      const cmd = latestSshState.command || document.getElementById('ssh-command-display').textContent;
+      try {
+        await navigator.clipboard.writeText(cmd);
+        const icon = document.getElementById('ssh-copy-icon');
+        const text = document.getElementById('ssh-copy-text');
+        if (icon) icon.textContent = "✅";
+        if (text) text.textContent = "Copiato!";
+        showToast(tr("sshCopied") || "Comando SSH copiato negli appunti!", "success");
+        setTimeout(() => {
+          if (icon) icon.textContent = "📋";
+          if (text) text.textContent = tr("btnCopy") || "Copia";
+        }, 2000);
+      } catch (err) {
+        showToast("Impossibile copiare: seleziona il testo manualmente", "error");
       }
     }
 
@@ -2518,7 +2832,15 @@
         s5BotDesc: 'Usa /menu per la Dashboard interattiva, /status per lo stato dei download, /sync per controllare aggiornamenti, o incolla qualsiasi link in chat!',
         donateBannerTitle: '☕ Ti piace Release Vault? Supporta il progetto!',
         donateBannerDesc: 'Se questo progetto ti è utile, puoi supportare lo sviluppo con una donazione su PayPal.',
-        prev: '← Indietro', next: 'Avanti →', finish: '✅ Salva e Avvia Release Vault'
+        prev: '← Indietro', next: 'Avanti →', finish: '✅ Salva e Avvia Release Vault',
+        setSshTitle: 'Accesso SSH Remoto', setSshSub: 'Attiva o disattiva il server OpenSSH per accedere al container tramite terminale.',
+        btnSshEnable: 'Attiva Server SSH', btnSshDisable: 'Disattiva Server SSH',
+        sshActiveNotice: 'Server SSH attivo e in ascolto', sshDisabledNotice: 'Server SSH attualmente disattivato.',
+        sshDisabledDesc: 'Nessuna porta è esposta e le connessioni remote da terminale sono bloccate.',
+        sshIpLabel: 'Indirizzo IP Host / Container', sshPortLabel: 'Porta SSH',
+        sshCmdLabel: 'Comando di connessione diretta (Terminale):', sshConfigTitle: 'Configurazione Porta e Credenziali Root',
+        lblSshPort: 'Porta SSH (Default: 22)', lblSshRootPass: 'Nuova Password Root', lblSshAddKey: 'Aggiungi Chiave SSH Pubblica',
+        btnApply: 'Applica', btnAdd: 'Aggiungi', btnCopy: 'Copia', sshCopied: 'Comando SSH copiato negli appunti!'
       },
       en: {
         loginSub: 'Private Release Archiver & Patch Notes', lblUsername: 'Username', lblPassword: 'Password', btnLogin: 'Sign In to Vault',
@@ -2597,7 +2919,15 @@
         s5BotDesc: 'Use /menu for the interactive dashboard, /status for live downloads & disk space, /sync to check updates, or paste any link in chat!',
         donateBannerTitle: '☕ Enjoying Release Vault? Support the project!',
         donateBannerDesc: 'If you find this project useful, you can support its development via PayPal.',
-        prev: '← Back', next: 'Next →', finish: '✅ Save & Launch Release Vault'
+        prev: '← Back', next: 'Next →', finish: '✅ Save & Launch Release Vault',
+        setSshTitle: 'Remote SSH Access', setSshSub: 'Enable or disable OpenSSH server to manage the container via terminal.',
+        btnSshEnable: 'Enable SSH Server', btnSshDisable: 'Disable SSH Server',
+        sshActiveNotice: 'SSH server running and listening', sshDisabledNotice: 'SSH server is currently disabled.',
+        sshDisabledDesc: 'No ports exposed and terminal connections are blocked.',
+        sshIpLabel: 'Host / Container IP Address', sshPortLabel: 'SSH Port',
+        sshCmdLabel: 'Direct connection command (Terminal):', sshConfigTitle: 'SSH Port & Root Credentials Configuration',
+        lblSshPort: 'SSH Port (Default: 22)', lblSshRootPass: 'New Root Password', lblSshAddKey: 'Add Public SSH Key',
+        btnApply: 'Apply', btnAdd: 'Add', btnCopy: 'Copy', sshCopied: 'SSH command copied to clipboard!'
       },
       es: {
         loginSub: 'Archivo Privado de Versiones y Notas', lblUsername: 'Usuario', lblPassword: 'Contraseña', btnLogin: 'Entrar al Vault',
@@ -2631,7 +2961,15 @@
         wizTitle: 'Asistente de Configuración y Manual — Release Vault', wizSub: 'Configuración paso a paso de Usuario, GitHub API, Nexus Mods, Bot de Telegram 24/7 y Comandos',
         s1Title: '¡Bienvenido a Release Vault!', s1Desc: 'Esta plataforma privada supervisa tus proyectos de GitHub y mods de Nexus Mods, descargando cada versión con archivos, código fuente, SHA256 y notas.',
         s1Hdr: '🔐 1. Configurar Credenciales de Administrador', donateBannerTitle: '☕ ¿Te gusta Release Vault? ¡Apoya el proyecto!',
-        donateBannerDesc: 'Puedes apoyar el desarrollo con una donación en PayPal.', prev: '← Atrás', next: 'Siguiente →', finish: '✅ Guardar e Iniciar'
+        donateBannerDesc: 'Puedes apoyar el desarrollo con una donación en PayPal.', prev: '← Atrás', next: 'Siguiente →', finish: '✅ Guardar e Iniciar',
+        setSshTitle: 'Acceso SSH Remoto', setSshSub: 'Activa o desactiva el servidor SSH para gestionar el contenedor por terminal.',
+        btnSshEnable: 'Activar Servidor SSH', btnSshDisable: 'Desactivar Servidor SSH',
+        sshActiveNotice: 'Servidor SSH activo y escuchando', sshDisabledNotice: 'El servidor SSH está desactivado actualmente.',
+        sshDisabledDesc: 'No hay puertos expuestos y las conexiones por terminal están bloqueadas.',
+        sshIpLabel: 'Dirección IP Host / Contenedor', sshPortLabel: 'Puerto SSH',
+        sshCmdLabel: 'Comando de conexión directa (Terminal):', sshConfigTitle: 'Configuración de Puerto y Credenciales Root',
+        lblSshPort: 'Puerto SSH (Por defecto: 22)', lblSshRootPass: 'Nueva Contraseña Root', lblSshAddKey: 'Añadir Clave SSH Pública',
+        btnApply: 'Aplicar', btnAdd: 'Añadir', btnCopy: 'Copiar', sshCopied: '¡Comando SSH copiado al portapapeles!'
       },
       fr: {
         loginSub: 'Archive Privée & Notes de Version', lblUsername: 'Nom d\'utilisateur', lblPassword: 'Mot de passe', btnLogin: 'Connexion au Vault',
@@ -2664,7 +3002,15 @@
         wizTitle: 'Assistant de Configuration & Manuel — Release Vault', wizSub: 'Configuration étape par étape : Compte Admin, API GitHub, Nexus Mods, Bot Telegram 24/7 et Commandes',
         s1Title: 'Bienvenue dans Release Vault !', s1Desc: 'Cette plateforme privée surveille vos projets GitHub et mods Nexus Mods, téléchargeant automatiquement chaque version avec fichiers, code source, SHA256 et notes.',
         s1Hdr: '🔐 1. Définir les Identifiants Administrateur', donateBannerTitle: '☕ Vous aimez Release Vault ? Soutenez le projet !',
-        donateBannerDesc: 'Vous pouvez soutenir le développement avec un don PayPal.', prev: '← Retour', next: 'Suivant →', finish: '✅ Enregistrer et Lancer'
+        donateBannerDesc: 'Vous pouvez soutenir le développement avec un don PayPal.', prev: '← Retour', next: 'Suivant →', finish: '✅ Enregistrer et Lancer',
+        setSshTitle: 'Accès SSH Distant', setSshSub: 'Activez ou désactivez le serveur SSH pour administrer le conteneur par terminal.',
+        btnSshEnable: 'Activer Serveur SSH', btnSshDisable: 'Désactiver Serveur SSH',
+        sshActiveNotice: 'Serveur SSH actif et à l\'écoute', sshDisabledNotice: 'Le serveur SSH est actuellement désactivé.',
+        sshDisabledDesc: 'Aucun port exposé et les connexions terminal sont bloquées.',
+        sshIpLabel: 'Adresse IP Hôte / Conteneur', sshPortLabel: 'Port SSH',
+        sshCmdLabel: 'Commande de connexion directe (Terminal) :', sshConfigTitle: 'Configuration du Port et Identifiants Root',
+        lblSshPort: 'Port SSH (Défaut : 22)', lblSshRootPass: 'Nouveau Mot de Passe Root', lblSshAddKey: 'Ajouter Clé SSH Publique',
+        btnApply: 'Appliquer', btnAdd: 'Ajouter', btnCopy: 'Copier', sshCopied: 'Commande SSH copiée dans le presse-papiers !'
       },
       de: {
         loginSub: 'Privates Release-Archiv & Patchnotes', lblUsername: 'Benutzername', lblPassword: 'Passwort', btnLogin: 'Im Vault anmelden',
@@ -2697,7 +3043,15 @@
         wizTitle: 'Einrichtungsassistent & Handbuch — Release Vault', wizSub: 'Schritt-für-Schritt-Einrichtung für Admin-Konto, GitHub API, Nexus Mods, 24/7 Telegram-Bot & Befehle',
         s1Title: 'Willkommen beim Release Vault!', s1Desc: 'Diese private Plattform überwacht Ihre GitHub-Projekte und Nexus Mods und lädt automatisch jede Version inklusive Binärdateien, Quellcode, SHA256 und Patchnotes herunter.',
         s1Hdr: '🔐 1. Administrator-Zugangsdaten festlegen', donateBannerTitle: '☕ Gefällt dir Release Vault? Unterstütze das Projekt!',
-        donateBannerDesc: 'Du kannst die Entwicklung mit einer Spende über PayPal unterstützen.', prev: '← Zurück', next: 'Weiter →', finish: '✅ Speichern & Starten'
+        donateBannerDesc: 'Du kannst die Entwicklung mit einer Spende über PayPal unterstützen.', prev: '← Zurück', next: 'Weiter →', finish: '✅ Speichern & Starten',
+        setSshTitle: 'SSH-Fernzugriff', setSshSub: 'Aktivieren oder deaktivieren Sie den OpenSSH-Server zur Terminal-Verwaltung.',
+        btnSshEnable: 'SSH-Server aktivieren', btnSshDisable: 'SSH-Server deaktivieren',
+        sshActiveNotice: 'SSH-Server aktiv und betriebsbereit', sshDisabledNotice: 'SSH-Server ist derzeit deaktiviert.',
+        sshDisabledDesc: 'Keine Ports freigegeben und Terminal-Verbindungen sind gesperrt.',
+        sshIpLabel: 'Host- / Container-IP-Adresse', sshPortLabel: 'SSH-Port',
+        sshCmdLabel: 'Direkter Verbindungsbefehl (Terminal):', sshConfigTitle: 'SSH-Port- & Root-Zugangsdaten-Konfiguration',
+        lblSshPort: 'SSH-Port (Standard: 22)', lblSshRootPass: 'Neues Root-Passwort', lblSshAddKey: 'Öffentlichen SSH-Schlüssel hinzufügen',
+        btnApply: 'Übernehmen', btnAdd: 'Hinzufügen', btnCopy: 'Kopieren', sshCopied: 'SSH-Befehl in Zwischenablage kopiert!'
       },
       pt: {
         loginSub: 'Arquivo Privado de Releases e Notas', lblUsername: 'Usuário', lblPassword: 'Senha', btnLogin: 'Entrar no Vault',
@@ -2730,7 +3084,15 @@
         wizTitle: 'Assistente de Configuração e Manual — Release Vault', wizSub: 'Configuração passo a passo de Admin, API GitHub, Nexus Mods, Bot Telegram 24/7 e Comandos',
         s1Title: 'Bem-vindo ao Release Vault!', s1Desc: 'Esta plataforma privada monitora seus projetos do GitHub e mods do Nexus Mods, baixando automaticamente cada versão com binários, código-fonte, SHA256 e notas.',
         s1Hdr: '🔐 1. Definir Credenciais de Administrador', donateBannerTitle: '☕ Gostou do Release Vault? Apoie o projeto!',
-        donateBannerDesc: 'Você pode apoiar o desenvolvimento com uma doação via PayPal.', prev: '← Voltar', next: 'Avançar →', finish: '✅ Salvar e Iniciar'
+        donateBannerDesc: 'Você pode apoiar o desenvolvimento com uma doação via PayPal.', prev: '← Voltar', next: 'Avançar →', finish: '✅ Salvar e Iniciar',
+        setSshTitle: 'Acesso SSH Remoto', setSshSub: 'Ative ou desative o servidor SSH para gerenciar o contêiner pelo terminal.',
+        btnSshEnable: 'Ativar Servidor SSH', btnSshDisable: 'Desativar Servidor SSH',
+        sshActiveNotice: 'Servidor SSH ativo e em execução', sshDisabledNotice: 'O servidor SSH está desativado no momento.',
+        sshDisabledDesc: 'Nenhuma porta exposta e as conexões de terminal estão bloqueadas.',
+        sshIpLabel: 'Endereço IP Host / Contêiner', sshPortLabel: 'Porta SSH',
+        sshCmdLabel: 'Comando de conexão direta (Terminal):', sshConfigTitle: 'Configuração de Porta e Credenciais Root',
+        lblSshPort: 'Porta SSH (Padrão: 22)', lblSshRootPass: 'Nova Senha Root', lblSshAddKey: 'Adicionar Chave SSH Pública',
+        btnApply: 'Aplicar', btnAdd: 'Adicionar', btnCopy: 'Copiar', sshCopied: 'Comando SSH copiado para a área de transferência!'
       },
       ru: {
         loginSub: 'Приватный Архив Релизов и Патчноутов', lblUsername: 'Имя пользователя', lblPassword: 'Пароль', btnLogin: 'Войти в Vault',
@@ -2763,7 +3125,15 @@
         wizTitle: 'Мастер Настройки и Руководство — Release Vault', wizSub: 'Пошаговая настройка аккаунта, GitHub API, Nexus Mods, Telegram-бота 24/7 и команд',
         s1Title: 'Добро пожаловать в Release Vault!', s1Desc: 'Эта приватная платформа отслеживает ваши проекты GitHub и моды Nexus Mods, автоматически скачивая каждый релиз с файлами, исходным кодом, SHA256 и патчноутами.',
         s1Hdr: '🔐 1. Установите учетные данные администратора', donateBannerTitle: '☕ Нравится Release Vault? Поддержите проект!',
-        donateBannerDesc: 'Вы можете поддержать разработку донатом через PayPal.', prev: '← Назад', next: 'Далее →', finish: '✅ Сохранить и Запустить'
+        donateBannerDesc: 'Вы можете поддержать разработку донатом через PayPal.', prev: '← Назад', next: 'Далее →', finish: '✅ Сохранить и Запустить',
+        setSshTitle: 'Удаленный доступ по SSH', setSshSub: 'Включение или отключение сервера OpenSSH для управления контейнером через терминал.',
+        btnSshEnable: 'Включить SSH-сервер', btnSshDisable: 'Отключить SSH-серver',
+        sshActiveNotice: 'SSH-сервер активен и ожидает подключений', sshDisabledNotice: 'SSH-сервер в настоящее время отключен.',
+        sshDisabledDesc: 'Порты закрыты, удаленный терминальный доступ заблокирован.',
+        sshIpLabel: 'IP-адрес хоста / контейнера', sshPortLabel: 'SSH порт',
+        sshCmdLabel: 'Команда прямого подключения (терминал):', sshConfigTitle: 'Настройка порта и пароля root',
+        lblSshPort: 'SSH порт (по умолчанию: 22)', lblSshRootPass: 'Новый пароль root', lblSshAddKey: 'Добавить публичный SSH ключ',
+        btnApply: 'Применить', btnAdd: 'Добавить', btnCopy: 'Копировать', sshCopied: 'Команда SSH скопирована в буфер обмена!'
       },
       zh: {
         loginSub: '私有版本归档与更新日志系统', lblUsername: '用户名', lblPassword: '密码', btnLogin: '登录 Vault',
@@ -2796,7 +3166,15 @@
         wizTitle: '设置向导与完整指南 — Release Vault', wizSub: '分步配置管理员账户、GitHub API、Nexus Mods、24/7 Telegram 机器人与命令说明',
         s1Title: '欢迎使用 Release Vault！', s1Desc: '该私有平台自动监控您的 GitHub 项目与 Nexus Mods 模组，自动下载并归档每个版本的二进制文件、源代码、SHA256 校验值及 Markdown 更新日志。',
         s1Hdr: '🔐 1. 设置管理员登录凭据', donateBannerTitle: '☕ 喜欢 Release Vault 吗？欢迎支持本项目！',
-        donateBannerDesc: '如果该项目对您有帮助，欢迎通过 PayPal 捐赠支持开发。', prev: '← 上一步', next: '下一步 →', finish: '✅ 保存并启动'
+        donateBannerDesc: '如果该项目对您有帮助，欢迎通过 PayPal 捐赠支持开发。', prev: '← 上一步', next: '下一步 →', finish: '✅ 保存并启动',
+        setSshTitle: '远程 SSH 访问', setSshSub: '启用或禁用 OpenSSH 服务器以通过终端管理容器。',
+        btnSshEnable: '启用 SSH 服务器', btnSshDisable: '禁用 SSH 服务器',
+        sshActiveNotice: 'SSH 服务器已启动并正在监听', sshDisabledNotice: 'SSH 服务器当前已禁用。',
+        sshDisabledDesc: '未开放端口，终端远程连接已被阻止。',
+        sshIpLabel: '主机 / 容器 IP 地址', sshPortLabel: 'SSH 端口',
+        sshCmdLabel: '直接连接命令（终端）：', sshConfigTitle: 'SSH 端口与 Root 凭据配置',
+        lblSshPort: 'SSH 端口（默认：22）', lblSshRootPass: '新 Root 密码', lblSshAddKey: '添加公钥 SSH',
+        btnApply: '应用', btnAdd: '添加', btnCopy: '复制', sshCopied: 'SSH 连接命令已复制到剪贴板！'
       },
       ja: {
         loginSub: 'プライベートリリース保管庫 & パッチノート', lblUsername: 'ユーザー名', lblPassword: 'パスワード', btnLogin: 'Vault にログイン',
@@ -2829,7 +3207,15 @@
         wizTitle: 'セットアップウィザード＆完全ガイド — Release Vault', wizSub: '管理者アカウント、GitHub API、Nexus Mods、24時間稼働 Telegram Bot、コマンドのステップバイステップ設定',
         s1Title: 'Release Vault へようこそ！', s1Desc: 'このプライベートプラットフォームは GitHub プロジェクトや Nexus Mods を監視し、バイナリ、ソースコード、SHA256、Markdown パッチノートを含む全リリースを自動ダウンロード・整理します。',
         s1Hdr: '🔐 1. 管理者ログイン情報の設定', donateBannerTitle: '☕ Release Vault を気に入っていただけましたか？',
-        donateBannerDesc: 'PayPal での寄付を通じてプロジェクトの開発をサポートできます。', prev: '← 戻る', next: '次へ →', finish: '✅ 保存して開始'
+        donateBannerDesc: 'PayPal での寄付を通じてプロジェクトの開発をサポートできます。', prev: '← 戻る', next: '次へ →', finish: '✅ 保存して開始',
+        setSshTitle: 'リモート SSH アクセス', setSshSub: 'ターミナルからコンテナを管理するための OpenSSH サーバーの有効化/無効化。',
+        btnSshEnable: 'SSH サーバーを有効化', btnSshDisable: 'SSH サーバーを無効化',
+        sshActiveNotice: 'SSH サーバーは稼働中で接続を待機しています', sshDisabledNotice: 'SSH サーバーは現在無効です。',
+        sshDisabledDesc: 'ポートは公開されておらず、端末接続はブロックされています。',
+        sshIpLabel: 'ホスト / コンテナ IP アドレス', sshPortLabel: 'SSH ポート',
+        sshCmdLabel: 'ダイレクト接続コマンド（端末）：', sshConfigTitle: 'SSH ポートおよび Root 認証情報設定',
+        lblSshPort: 'SSH ポート（初期値：22）', lblSshRootPass: '新しい Root パスワード', lblSshAddKey: '公開 SSH キーの追加',
+        btnApply: '適用', btnAdd: '追加', btnCopy: 'コピー', sshCopied: 'SSH 接続コマンドをクリップボードにコピーしました！'
       },
       ko: {
         loginSub: '프라이빗 릴리스 아카이브 & 패치노트', lblUsername: '사용자 이름', lblPassword: '비밀번호', btnLogin: 'Vault 로그인',
@@ -2862,7 +3248,15 @@
         wizTitle: '설정 마법사 및 전체 가이드 — Release Vault', wizSub: '관리자 계정, GitHub API, Nexus Mods, 24/7 텔레그램 봇 및 명령어 단계별 설정',
         s1Title: 'Release Vault에 오신 것을 환영합니다!', s1Desc: '이 프라이빗 플랫폼은 GitHub 프로젝트와 Nexus Mods를 모니터링하여 바이너리, 소스 코드, SHA256 체크섬 및 패치 노트를 자동으로 다운로드하고 분류합니다.',
         s1Hdr: '🔐 1. 관리자 로그인 자격 증명 설정', donateBannerTitle: '☕ Release Vault가 마음에 드시나요? 프로젝트를 후원해 주세요!',
-        donateBannerDesc: 'PayPal 기부를 통해 프로젝트 개발을 응원하실 수 있습니다.', prev: '← 이전', next: '다음 →', finish: '✅ 저장 및 시작'
+        donateBannerDesc: 'PayPal 기부를 통해 프로젝트 개발을 응원하실 수 있습니다.', prev: '← 이전', next: '다음 →', finish: '✅ 저장 및 시작',
+        setSshTitle: '원격 SSH 접속', setSshSub: '터미널에서 컨테이너를 관리하기 위한 OpenSSH 서버 활성화/비활성화.',
+        btnSshEnable: 'SSH 서버 활성화', btnSshDisable: 'SSH 서버 비활성화',
+        sshActiveNotice: 'SSH 서버가 실행 중이며 연결 대기 중입니다', sshDisabledNotice: 'SSH 서버가 현재 비활성화되어 있습니다.',
+        sshDisabledDesc: '포트가 열려 있지 않으며 터미널 접속이 차단됩니다.',
+        sshIpLabel: '호스트 / 컨테이너 IP 주소', sshPortLabel: 'SSH 포트',
+        sshCmdLabel: '직접 접속 명령어 (터미널):', sshConfigTitle: 'SSH 포트 및 Root 비밀번호 설정',
+        lblSshPort: 'SSH 포트 (기본값: 22)', lblSshRootPass: '새 Root 비밀번호', lblSshAddKey: '공개 SSH 키 추가',
+        btnApply: '적용', btnAdd: '추가', btnCopy: '복사', sshCopied: 'SSH 명령어가 클립보드에 복사되었습니다!'
       }
     };
 
@@ -2902,6 +3296,9 @@
       if (currentRepoDetail) {
         renderRepoVersionsList();
         renderSelectedReleaseInspector();
+      }
+      if (typeof latestSshState !== 'undefined' && latestSshState.command) {
+        updateSshUI(latestSshState);
       }
     }
 
@@ -3001,6 +3398,7 @@
     // Boot
     applyLanguageUI(currentLang);
     checkSession();
+    loadSshStatus();
   </script>
 </body>
 </html>

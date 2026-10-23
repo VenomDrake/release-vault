@@ -9,6 +9,8 @@ import re
 import shutil
 import sqlite3
 import smtplib
+import socket
+import subprocess
 import time
 import zipfile
 from contextlib import asynccontextmanager
@@ -1821,6 +1823,16 @@ class SetupWizardRequest(BaseModel):
     discord_webhook_url: Optional[str] = None
 
 
+class SshToggleRequest(BaseModel):
+    enable: bool
+
+
+class SshConfigureRequest(BaseModel):
+    port: Optional[int] = None
+    root_password: Optional[str] = None
+    authorized_key: Optional[str] = None
+
+
 # --- Auth & First-Run Setup Endpoints ---
 @app.post("/api/setup/complete")
 async def api_complete_setup(req: SetupWizardRequest, request: Request, response: Response):
@@ -2045,6 +2057,7 @@ async def api_overview():
         "last_check_time": LAST_CHECK_TIME,
         "next_check_time": NEXT_CHECK_TIME,
         "recent_logs": recent_logs,
+        "ssh": get_ssh_status_dict(),
     }
 
 
@@ -2993,6 +3006,202 @@ async def api_test_notification():
         total_size=42 * 1024 * 1024,
     )
     return {"ok": True, "message": "Notifica di test inviata ai canali configurati"}
+
+
+# --- SSH Server & Remote Management Helpers ---
+def get_local_ip() -> str:
+    try:
+        res = subprocess.run(["hostname", "-I"], capture_output=True, text=True, timeout=2)
+        if res.returncode == 0:
+            ips = [x for x in res.stdout.strip().split() if ":" not in x and not x.startswith("127.")]
+            if ips:
+                return ips[0]
+    except Exception:
+        pass
+
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("1.1.1.1", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
+
+def get_ssh_port() -> int:
+    cfg = get_settings_dict()
+    p_str = cfg.get("ssh_port", "22")
+    try:
+        p = int(p_str)
+        if 1 <= p <= 65535:
+            return p
+    except ValueError:
+        pass
+    return 22
+
+
+def get_ssh_status_dict() -> Dict[str, Any]:
+    ip = get_local_ip()
+    port = get_ssh_port()
+
+    is_active = False
+    has_systemd = False
+
+    try:
+        res = subprocess.run(["systemctl", "is-active", "ssh.service"], capture_output=True, text=True, timeout=3)
+        has_systemd = True
+        if res.stdout.strip() == "active":
+            is_active = True
+        else:
+            res_sock = subprocess.run(["systemctl", "is-active", "ssh.socket"], capture_output=True, text=True, timeout=3)
+            if res_sock.stdout.strip() == "active":
+                is_active = True
+            else:
+                res_sshd = subprocess.run(["systemctl", "is-active", "sshd.service"], capture_output=True, text=True, timeout=3)
+                if res_sshd.stdout.strip() == "active":
+                    is_active = True
+    except Exception:
+        pass
+
+    if not is_active and not has_systemd:
+        try:
+            res_ps = subprocess.run(["pgrep", "-f", "sshd"], capture_output=True, text=True, timeout=2)
+            if res_ps.returncode == 0 and res_ps.stdout.strip():
+                is_active = True
+        except Exception:
+            pass
+
+    auth_keys_path = Path("/root/.ssh/authorized_keys")
+    has_keys = False
+    key_count = 0
+    if auth_keys_path.exists():
+        try:
+            lines = [line.strip() for line in auth_keys_path.read_text(encoding="utf-8").splitlines() if line.strip() and not line.startswith("#")]
+            key_count = len(lines)
+            has_keys = key_count > 0
+        except Exception:
+            pass
+
+    cmd = f"ssh root@{ip}" + (f" -p {port}" if port != 22 else "")
+
+    return {
+        "available": True,
+        "active": is_active,
+        "ip": ip,
+        "port": port,
+        "user": "root",
+        "command": cmd,
+        "has_keys": has_keys,
+        "key_count": key_count,
+    }
+
+
+def set_ssh_status(enable: bool) -> Dict[str, Any]:
+    port = get_ssh_port()
+    conf_dir = Path("/etc/ssh/sshd_config.d")
+    conf_file = conf_dir / "vault-ssh.conf"
+
+    if enable:
+        try:
+            conf_dir.mkdir(parents=True, exist_ok=True)
+            conf_content = f"Port {port}\nPermitRootLogin yes\nPasswordAuthentication yes\n"
+            conf_file.write_text(conf_content, encoding="utf-8")
+        except Exception as e:
+            logger.warning(f"Could not write {conf_file}: {e}")
+
+        try:
+            subprocess.run(["systemctl", "enable", "--now", "ssh.socket", "ssh.service", "sshd.service"], capture_output=True, timeout=5)
+            subprocess.run(["systemctl", "restart", "ssh.socket", "ssh.service", "sshd.service"], capture_output=True, timeout=5)
+        except Exception:
+            try:
+                subprocess.run(["/usr/sbin/sshd"], capture_output=True, timeout=5)
+            except Exception:
+                pass
+
+        set_setting("ssh_enabled", "1")
+        log_activity(f"Server SSH attivato sulla porta {port}.", "SYSTEM", "info")
+    else:
+        try:
+            subprocess.run(["systemctl", "disable", "--now", "ssh.service", "ssh.socket", "sshd.service"], capture_output=True, timeout=5)
+        except Exception:
+            try:
+                subprocess.run(["pkill", "-f", "sshd"], capture_output=True, timeout=5)
+            except Exception:
+                pass
+
+        set_setting("ssh_enabled", "0")
+        log_activity("Server SSH disattivato dal pannello.", "SYSTEM", "warning")
+
+    return get_ssh_status_dict()
+
+
+def configure_ssh_settings(
+    port: Optional[int] = None,
+    root_password: Optional[str] = None,
+    authorized_key: Optional[str] = None,
+) -> Dict[str, Any]:
+    if port is not None and 1 <= port <= 65535:
+        set_setting("ssh_port", str(port))
+        conf_dir = Path("/etc/ssh/sshd_config.d")
+        conf_file = conf_dir / "vault-ssh.conf"
+        try:
+            conf_dir.mkdir(parents=True, exist_ok=True)
+            conf_file.write_text(f"Port {port}\nPermitRootLogin yes\nPasswordAuthentication yes\n", encoding="utf-8")
+        except Exception as e:
+            logger.warning(f"Failed to update {conf_file}: {e}")
+
+    if root_password and root_password.strip():
+        pw = root_password.strip()
+        try:
+            p = subprocess.Popen(["chpasswd"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            p.communicate(input=f"root:{pw}\n")
+            log_activity("Password utente root aggiornata con successo.", "SYSTEM", "info")
+        except Exception as e:
+            logger.error(f"Failed to set root password: {e}")
+            raise HTTPException(status_code=500, detail=f"Errore impostazione password root: {e}")
+
+    if authorized_key and authorized_key.strip():
+        key_line = authorized_key.strip().splitlines()[0]
+        ssh_dir = Path("/root/.ssh")
+        ssh_dir.mkdir(parents=True, exist_ok=True)
+        os.chmod(str(ssh_dir), 0o700)
+        auth_file = ssh_dir / "authorized_keys"
+        existing = auth_file.read_text(encoding="utf-8") if auth_file.exists() else ""
+        if key_line not in existing:
+            with open(auth_file, "a", encoding="utf-8") as f:
+                f.write("\n" + key_line + "\n")
+            os.chmod(str(auth_file), 0o600)
+            log_activity("Nuova chiave pubblica SSH aggiunta ad authorized_keys.", "SYSTEM", "info")
+
+    status = get_ssh_status_dict()
+    if status["active"]:
+        try:
+            subprocess.run(["systemctl", "restart", "ssh.socket", "ssh.service", "sshd.service"], capture_output=True, timeout=5)
+        except Exception:
+            pass
+
+    return get_ssh_status_dict()
+
+
+# --- SSH Endpoints ---
+@app.get("/api/ssh/status", dependencies=[Depends(require_auth)])
+async def api_ssh_status():
+    return get_ssh_status_dict()
+
+
+@app.post("/api/ssh/toggle", dependencies=[Depends(require_auth)])
+async def api_ssh_toggle(req: SshToggleRequest):
+    return set_ssh_status(req.enable)
+
+
+@app.post("/api/ssh/configure", dependencies=[Depends(require_auth)])
+async def api_ssh_configure(req: SshConfigureRequest):
+    return configure_ssh_settings(
+        port=req.port,
+        root_password=req.root_password,
+        authorized_key=req.authorized_key,
+    )
 
 
 # --- Serve SPA Frontend ---

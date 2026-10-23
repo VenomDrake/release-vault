@@ -116,6 +116,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 Categorie",
         "reply_btn_sync": "🔄 Check Release",
         "reply_btn_lang": "🌐 Lingua",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "Disattivato",
     },
     "en": {
         "bot_title": "Release Vault - Private Bot",
@@ -192,6 +194,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 Categories",
         "reply_btn_sync": "🔄 Check Releases",
         "reply_btn_lang": "🌐 Language",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "Disabled",
     },
     "es": {
         "bot_title": "Release Vault - Bot Privado",
@@ -268,6 +272,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 Categorías",
         "reply_btn_sync": "🔄 Verificar Versiones",
         "reply_btn_lang": "🌐 Idioma",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "Desactivado",
     },
     "fr": {
         "bot_title": "Release Vault - Bot Privé",
@@ -344,6 +350,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 Catégories",
         "reply_btn_sync": "🔄 Vérifier Mises à jour",
         "reply_btn_lang": "🌐 Langue",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "Désactivé",
     },
     "de": {
         "bot_title": "Release Vault - Privater Bot",
@@ -420,6 +428,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 Kategorien",
         "reply_btn_sync": "🔄 Releases prüfen",
         "reply_btn_lang": "🌐 Sprache",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "Deaktiviert",
     },
     "pt": {
         "bot_title": "Release Vault - Bot Privado",
@@ -496,6 +506,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 Categorias",
         "reply_btn_sync": "🔄 Verificar Versões",
         "reply_btn_lang": "🌐 Idioma",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "Desativado",
     },
     "ru": {
         "bot_title": "Release Vault - Приватный Бот",
@@ -572,6 +584,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 Категории",
         "reply_btn_sync": "🔄 Проверить релизы",
         "reply_btn_lang": "🌐 Язык",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "Отключен",
     },
     "zh": {
         "bot_title": "Release Vault - 私人机器人",
@@ -648,6 +662,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 分类",
         "reply_btn_sync": "🔄 检查更新",
         "reply_btn_lang": "🌐 语言",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "已禁用",
     },
     "ja": {
         "bot_title": "Release Vault - プライベートボット",
@@ -724,6 +740,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 カテゴリ",
         "reply_btn_sync": "🔄 リリース確認",
         "reply_btn_lang": "🌐 言語",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "無効",
     },
     "ko": {
         "bot_title": "Release Vault - 전용 봇",
@@ -800,6 +818,8 @@ I18N: Dict[str, Dict[str, str]] = {
         "reply_btn_menu": "📁 카테고리",
         "reply_btn_sync": "🔄 릴리즈 확인",
         "reply_btn_lang": "🌐 언어",
+        "ssh_title": "SSH Server",
+        "ssh_inactive": "비활성화됨",
     },
 }
 
@@ -983,6 +1003,14 @@ async def build_dashboard_message(client: httpx.AsyncClient) -> tuple[str, Dict[
 
     cats = ov.get("categories") or ["Giochi", "Emulatore", "MOD VR"]
 
+    ssh_info = ov.get("ssh") or {}
+    if ssh_info.get("active"):
+        ssh_ip = ssh_info.get("ip") or "127.0.0.1"
+        ssh_port = ssh_info.get("port") or 22
+        ssh_line = f"🟢 <code>{ssh_ip}:{ssh_port}</code>"
+    else:
+        ssh_line = f"⚪️ <i>{tr('ssh_inactive', lang)}</i>"
+
     text = (
         f"🛡 <b>{tr('bot_title', lang)}</b>\n"
         f"👤 <i>{tr('auth_line', lang)} (ID: {AUTHORIZED_USER_ID})</i>\n\n"
@@ -990,7 +1018,8 @@ async def build_dashboard_message(client: httpx.AsyncClient) -> tuple[str, Dict[
         f"🏷 <b>{tr('archived_releases', lang)}:</b> {ov.get('completed_releases', 0)} / {ov.get('total_releases', 0)}\n"
         f"📁 <b>{tr('saved_files', lang)}:</b> {ov.get('completed_assets', 0)} ({format_bytes(ov.get('archive_bytes', 0))})\n"
         f"💾 <b>{tr('disk_space', lang)}:</b> {format_bytes(ov.get('disk_used', 0))} {tr('used', lang)} / "
-        f"<b>{format_bytes(ov.get('disk_free', 0))} {tr('free', lang)}</b> (su {format_bytes(ov.get('disk_total', 0))})\n\n"
+        f"<b>{format_bytes(ov.get('disk_free', 0))} {tr('free', lang)}</b> (su {format_bytes(ov.get('disk_total', 0))})\n"
+        f"🔐 <b>{tr('ssh_title', lang)}:</b> {ssh_line}\n\n"
         f"🔄 <b>{tr('queue_status', lang)}:</b>\n{dl_line}\n\n"
         f"{tr('send_link_hint', lang)}"
     )
